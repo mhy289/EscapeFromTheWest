@@ -1,0 +1,44 @@
+# ========================
+# Cocos Creator 项目忽略规则（微信小游戏版）
+# ========================
+
+# --- 构建产物 ---
+build/
+dist/
+release/
+
+# --- Cocos 自动生成 ---
+library/
+local/
+temp/
+
+# --- 依赖包 ---
+node_modules/
+
+# --- IDE/编辑器 ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 日志 & 缓存 ---
+*.log
+*.tmp
+
+# --- 系统文件 ---
+ehthumbs.db
+desktop.ini
+
+# --- 微信小游戏相关 ---
+# 构建后的小游戏工程目录（一般在 build/wechatgame/）
+# 注意：如果你想把小游戏工程直接提交，可以去掉下面这一行
+wechatgame/
+
+# ========================
+# 建议提交的内容
+# ========================
+# assets/        -> 游戏资源（图片、音效、Prefab 等）
+# packages/      -> 扩展插件
+# settings/      -> 项目设置
+# project.json   -> 项目配置
+# tsconfig.json  -> TypeScript 配置
