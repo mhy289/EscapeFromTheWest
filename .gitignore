@@ -4,6 +4,7 @@
 
 # Cocos Creator 本地编辑器配置
 .creator/
+profiles/
 
 
 # --- 构建产物 ---
