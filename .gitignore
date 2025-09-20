@@ -2,6 +2,10 @@
 # Cocos Creator 项目忽略规则（微信小游戏版）
 # ========================
 
+# Cocos Creator 本地编辑器配置
+.creator/
+
+
 # --- 构建产物 ---
 build/
 dist/
