@@ -1,3 +1,6 @@
+> [中文版本 (Chinese Version)](README.md)| [English Version](README_en.md)
+
+
 # EscapeFromTheWest
 
 ## 项目简介
@@ -65,5 +68,8 @@ EscapeFromTheWest/
 - 每日下班前同步 `main` 分支代码，避免冲突积累
 - 遇到技术问题或冲突，优先在团队群沟通
 - 版本发布后需在 `main` 分支打 Tag（如 `v1.0.0`），并注明发布内容
+
+## 行为准则
+本项目遵循 [Contributor Covenant v2.0](CODE_OF_CONDUCT.md) 行为准则，参与前请仔细阅读。
 
 如需进一步说明，请参考 `DEVELOPMENT_GUIDE.md` 或联系团队负责人。
