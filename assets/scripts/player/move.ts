@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, input, KeyCode, RigidBody2D} from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('move')
