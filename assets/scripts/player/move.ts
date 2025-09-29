@@ -13,7 +13,7 @@ export class move extends Component {
             move()
         } */
         //else {
-            move2d()
+            this.move2d()
        //}
     }
 
