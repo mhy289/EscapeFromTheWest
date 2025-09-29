@@ -1,10 +1,22 @@
-import { _decorator, Component, Node, input, KeyCode, RigidBody2D} from 'cc';
+import { _decorator, Component, Node, input, KeyCode, RigidBody2D } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('move')
 export class move extends Component {
     start() {
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+    }
 
+    // 按键状态记录
+    private keys: Record<number, boolean> = {};
+
+    onKeyDown(event) {
+        this.keys[event.keyCode] = true;
+    }
+
+    onKeyUp(event) {
+        this.keys[event.keyCode] = false;
     }
 
     update(deltaTime: number) {
@@ -13,27 +25,27 @@ export class move extends Component {
             move()
         } */
         //else {
-            this.move2d()
-       //}
+        this.move2d()
+        //}
     }
 
     //wasd移动2d图片
     move2d() {
         const pos = this.node.getPosition();
-        if (input.isKeyDown(KeyCode.W)) {
-            console.log("移动了w"+pos.y)
+        if (this.keys[KeyCode.W]) {
+            console.log("移动了w" + pos.y)
             pos.y += 0.1;
         }
-        if (input.isKeyDown(KeyCode.S)) {
-            console.log("移动了s"+pos.y)
+        if (this.keys[KeyCode.S]) {
+            console.log("移动了s" + pos.y)
             pos.y -= 0.1;
         }
-        if (input.isKeyDown(KeyCode.A)) {
-            console.log("移动了a"+pos.x)
+        if (this.keys[KeyCode.A]) {
+            console.log("移动了a" + pos.x)
             pos.x -= 0.1;
         }
-        if (input.isKeyDown(KeyCode.D)) {
-            console.log("移动了d"+pos.x)
+        if (this.keys[KeyCode.D]) {
+            console.log("移动了d" + pos.x)
             pos.x += 0.1;
         }
         this.node.setPosition(pos);
