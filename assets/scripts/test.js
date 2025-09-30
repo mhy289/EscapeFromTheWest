@@ -1,1 +1,3 @@
-mlksmdkls
+function test() {
+    console.log('test')
+}
