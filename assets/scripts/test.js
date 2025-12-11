@@ -1,1 +1,3 @@
-whoever watch this note is my son
+function test() {
+    console.log('test')
+}
