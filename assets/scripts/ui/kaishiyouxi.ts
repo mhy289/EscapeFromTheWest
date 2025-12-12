@@ -14,6 +14,7 @@ export class kaishiyouxi extends Component {
     btnLogin: cc.Button = null;
 
     onLoad () {
+        cc.log("onLoad");
         this.btnLogin.interactable = false;
         cc.director.preloadScene(this.sceneName, this.prloadSceneCallback.bind(this));
     }
@@ -22,15 +23,19 @@ export class kaishiyouxi extends Component {
 
     }
 
+    //登录按钮点击事件
     btnLoginClick(e:cc.Event, custom:string){
+        cc.log("按钮点击事件", custom);
         cc.director.loadScene(this.sceneName, this.loadSceneCallback);
     }
 
+    //预加载场景完成回调
     prloadSceneCallback(){
         cc.log("预加载场景完成");
         this.btnLogin.interactable = true;
     }
 
+    //加载场景完成回调
     loadSceneCallback(){
         cc.log("加载场景完成");
     }
