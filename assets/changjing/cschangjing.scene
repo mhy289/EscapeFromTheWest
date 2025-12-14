@@ -2332,7 +2332,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -2512,6 +2512,7 @@
     "randomOffset": 1,
     "swayFrequency": 1.5,
     "stopDistance": 0.5,
+    "failDistance": 0.4,
     "_id": "a7VMfxF8pLcpQgP+KoVs6C"
   },
   {
