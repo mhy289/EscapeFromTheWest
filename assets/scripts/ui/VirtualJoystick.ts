@@ -3,14 +3,22 @@ const { ccclass, property } = _decorator;
 
 @ccclass('VirtualJoystick')
 export class VirtualJoystick extends Component {
-    @property(Node)
-    joystickBg: Node = null; // 摇杆背景
+    @property({
+        type: Node,
+        tooltip: '摇杆背景：摇杆的背景节点，用于确定摇杆的中心位置和触摸区域（必需）'
+    })
+    joystickBg: Node = null;
 
-    @property(Node)
-    joystickKnob: Node = null; // 摇杆手柄
+    @property({
+        type: Node,
+        tooltip: '摇杆手柄：摇杆的可移动手柄节点，会跟随手指/鼠标移动（必需）'
+    })
+    joystickKnob: Node = null;
 
-    @property
-    maxRadius: number = 80; // 摇杆最大半径
+    @property({
+        tooltip: '最大半径：摇杆手柄距离中心的最大距离，单位像素（默认：80像素）\n建议值：移动摇杆60-80，朝向摇杆80-100'
+    })
+    maxRadius: number = 80;
 
     // 回调函数
     private onJoystickMove: ((angle: number, distance: number) => void) = null;

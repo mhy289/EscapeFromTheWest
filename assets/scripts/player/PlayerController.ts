@@ -8,20 +8,34 @@ const { ccclass, property } = _decorator;
 @ccclass('PlayerController')
 export class PlayerController extends Component {
     // 组件引用
-    @property(PlayerShooter)
+    @property({
+        type: PlayerShooter,
+        tooltip: '射击组件：玩家节点的PlayerShooter脚本组件，负责射击控制（必需）'
+    })
     shooter: PlayerShooter = null;
 
-    @property(move)
+    @property({
+        type: move,
+        tooltip: '移动组件：玩家节点的move脚本组件，负责角色移动（必需）'
+    })
     mover: move = null;
 
-    @property(VirtualJoystick)
+    @property({
+        type: VirtualJoystick,
+        tooltip: '单摇杆组件：单摇杆模式下的虚拟摇杆控制器（可选，推荐使用DualJoystick）'
+    })
     joystick: VirtualJoystick = null;
 
-    @property(DualJoystick)
-    dualJoystick: DualJoystick = null; // 双摇杆系统
+    @property({
+        type: DualJoystick,
+        tooltip: '双摇杆组件：虚拟摇杆模式下的双摇杆控制器，左摇杆移动+右摇杆朝向（虚拟摇杆模式推荐）'
+    })
+    dualJoystick: DualJoystick = null;
 
     // 玩家属性
-    @property
+    @property({
+        tooltip: '最大生命值：角色的最大生命值，起始生命值将等于此值（默认：100）'
+    })
     maxHealth: number = 100;
 
     private currentHealth: number = 100;

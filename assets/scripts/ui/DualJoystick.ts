@@ -10,11 +10,17 @@ export interface JoystickData {
 
 @ccclass('DualJoystick')
 export class DualJoystick extends Component {
-    @property(VirtualJoystick)
-    leftJoystick: VirtualJoystick = null; // 左摇杆：控制移动
+    @property({
+        type: VirtualJoystick,
+        tooltip: '左摇杆：用于控制角色移动的摇杆，推荐最大半径60-80像素（必需）'
+    })
+    leftJoystick: VirtualJoystick = null;
 
-    @property(VirtualJoystick)
-    rightJoystick: VirtualJoystick = null; // 右摇杆：控制朝向
+    @property({
+        type: VirtualJoystick,
+        tooltip: '右摇杆：用于控制射击方向的摇杆，推荐最大半径80-100像素（必需）'
+    })
+    rightJoystick: VirtualJoystick = null;
 
     // 回调函数
     private onLeftJoystickMove: ((data: JoystickData) => void) = null;

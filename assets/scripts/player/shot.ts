@@ -3,40 +3,67 @@ const { ccclass, property } = _decorator;
 
 @ccclass('PlayerShooter')
 export class PlayerShooter extends Component {
-    @property(Prefab)
+    @property({
+        type: Prefab,
+        tooltip: '子弹预制体：需要包含Bullet脚本的子弹对象预制体'
+    })
     bulletPrefab: Prefab = null;
 
-    @property
+    @property({
+        tooltip: '子弹速度：子弹飞行的速度，数值越大子弹飞行越快（默认：800）'
+    })
     bulletSpeed: number = 800;
 
-    @property
-    fireRate: number = 0.15; // 射击间隔（秒）
+    @property({
+        tooltip: '射击频率：两次射击之间的最小间隔时间，单位秒（默认：0.15秒，约每秒6-7发）'
+    })
+    fireRate: number = 0.15;
 
-    @property
-    maxAmmo: number = 30; // 最大弹药
+    @property({
+        tooltip: '最大弹药数：一个弹匣能装填的子弹数量（默认：30发）'
+    })
+    maxAmmo: number = 30;
 
-    @property
-    reloadTime: number = 2.0; // 换弹时间（秒）
+    @property({
+        tooltip: '换弹时间：从开始换弹到完成换弹所需的时间，单位秒（默认：2.0秒）'
+    })
+    reloadTime: number = 2.0;
 
-    @property
-    bulletDamage: number = 25; // 子弹伤害
+    @property({
+        tooltip: '子弹伤害：每发子弹对敌人造成的伤害值（默认：25点伤害）'
+    })
+    bulletDamage: number = 25;
 
-    @property(Camera)
-    mainCamera: Camera = null; // 主相机，用于鼠标控制
+    @property({
+        type: Camera,
+        tooltip: '主相机：用于鼠标模式下计算鼠标方向，必须绑定场景中的主相机（键盘鼠标模式必需）'
+    })
+    mainCamera: Camera = null;
 
     // UI按钮节点（虚拟摇杆模式使用）
-    @property(Node)
+    @property({
+        type: Node,
+        tooltip: '开火按钮：虚拟摇杆模式下的开火按钮节点，按住可连续射击（虚拟摇杆模式必需）'
+    })
     fireButton: Node = null;
 
-    @property(Node)
+    @property({
+        type: Node,
+        tooltip: '换弹按钮：虚拟摇杆模式下的换弹按钮节点，点击触发换弹（虚拟摇杆模式必需）'
+    })
     reloadButton: Node = null;
 
-    @property(Node)
-    virtualJoystick: Node = null; // 虚拟摇杆节点
+    @property({
+        type: Node,
+        tooltip: '虚拟摇杆节点：单摇杆模式下的摇杆节点，用于控制射击方向（可选，推荐使用DualJoystick）'
+    })
+    virtualJoystick: Node = null;
 
     // 操作模式
-    @property
-    useVirtualJoystick: boolean = false; // false: 键盘鼠标模式, true: 虚拟摇杆模式
+    @property({
+        tooltip: '操作模式：false=键盘鼠标模式（WASD+鼠标+左键+R键），true=虚拟摇杆模式（双摇杆+按钮）'
+    })
+    useVirtualJoystick: boolean = false;
 
     // 状态变量
     private canFire: boolean = true;

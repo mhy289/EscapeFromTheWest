@@ -3,6 +3,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Bullet')
 export class Bullet extends Component {
+    // 子弹属性（通过initialize方法设置）
     private direction: Vec3 = new Vec3(1, 0, 0); // 默认向右
     private speed: number = 800;
     private damage: number = 25;

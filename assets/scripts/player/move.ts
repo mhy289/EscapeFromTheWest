@@ -5,14 +5,21 @@ const { ccclass, property } = _decorator;
 @ccclass('move')
 export class move extends Component {
 
-    @property
+    @property({
+        tooltip: '移动速度：角色移动的基础速度，数值越大移动越快（默认：10）'
+    })
     speed: number = 10;
 
-    @property
-    useVirtualJoystick: boolean = false; // false: 键盘模式, true: 虚拟摇杆模式
+    @property({
+        tooltip: '操作模式：false=键盘模式（WASD键控制移动），true=虚拟摇杆模式（左摇杆控制移动）\n注意：必须与PlayerShooter组件的设置保持一致'
+    })
+    useVirtualJoystick: boolean = false;
 
-    @property(DualJoystick)
-    dualJoystick: DualJoystick = null; // 双摇杆系统（虚拟摇杆模式使用）
+    @property({
+        type: DualJoystick,
+        tooltip: '双摇杆系统：虚拟摇杆模式下的双摇杆控制器，左摇杆用于移动控制（虚拟摇杆模式必需）'
+    })
+    dualJoystick: DualJoystick = null;
 
     // 按键状态（键盘模式）
     private moveUp: boolean = false;

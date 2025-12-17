@@ -7,32 +7,59 @@ const { ccclass, property } = _decorator;
 @ccclass('GameUI')
 export class GameUI extends Component {
     // UI元素引用
-    @property(Node)
+    @property({
+        type: Node,
+        tooltip: '开火按钮：虚拟摇杆模式下的开火按钮节点，用于触发射击（虚拟摇杆模式必需）'
+    })
     fireButton: Node = null;
 
-    @property(Node)
+    @property({
+        type: Node,
+        tooltip: '换弹按钮：虚拟摇杆模式下的换弹按钮节点，用于触发换弹（虚拟摇杆模式必需）'
+    })
     reloadButton: Node = null;
 
-    @property(Label)
+    @property({
+        type: Label,
+        tooltip: '弹药标签：显示当前弹药信息的文本标签，格式为"当前/最大"（推荐）'
+    })
     ammoLabel: Label = null;
 
-    @property(Label)
+    @property({
+        type: Label,
+        tooltip: '生命值标签：显示当前生命值的文本标签，格式为"当前/最大"（推荐）'
+    })
     healthLabel: Label = null;
 
-    @property(Node)
+    @property({
+        type: Node,
+        tooltip: '摇杆节点：单摇杆模式下的虚拟摇杆节点（可选，推荐使用DualJoystick）'
+    })
     joystickNode: Node = null;
 
-    @property(Node)
-    dualJoystickNode: Node = null; // 双摇杆节点
+    @property({
+        type: Node,
+        tooltip: '双摇杆节点：虚拟摇杆模式下的双摇杆容器节点（虚拟摇杆模式推荐）'
+    })
+    dualJoystickNode: Node = null;
 
-    @property(Node)
-    keyboardUI: Node = null; // 键盘模式UI
+    @property({
+        type: Node,
+        tooltip: '键盘UI容器：键盘鼠标模式下的UI容器节点，包含弹药和生命值显示（键盘模式推荐）'
+    })
+    keyboardUI: Node = null;
 
-    @property(Node)
-    virtualJoystickUI: Node = null; // 虚拟摇杆模式UI
+    @property({
+        type: Node,
+        tooltip: '摇杆UI容器：虚拟摇杆模式下的UI容器节点，包含按钮、弹药、生命值和摇杆（虚拟摇杆模式推荐）'
+    })
+    virtualJoystickUI: Node = null;
 
     // 组件引用
-    @property(PlayerShooter)
+    @property({
+        type: PlayerShooter,
+        tooltip: '玩家射击组件：玩家节点的PlayerShooter脚本，用于获取弹药信息和设置回调（必需）'
+    })
     playerShooter: PlayerShooter = null;
 
     private virtualJoystick: VirtualJoystick = null;
