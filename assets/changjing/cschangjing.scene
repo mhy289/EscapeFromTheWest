@@ -179,7 +179,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 419.4255874673629,
+    "_orthoHeight": 435.2,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -2355,7 +2355,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "speed": 10,
+    "speed": 100,
     "_id": "17SU2A+UxHYaIIk0jboqDs"
   },
   {
