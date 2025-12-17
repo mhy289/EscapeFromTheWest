@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, input, Input, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3 } from 'cc';
+import { _decorator, Component, Node, input, Input, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, systemEvent, SystemEvent } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerShooter')
@@ -105,10 +105,12 @@ export class PlayerShooter extends Component {
         input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         
-        // 鼠标事件
-        input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
-        input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
-        input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+        // 鼠标事件 - 使用系统事件
+        systemEvent.on(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
+        systemEvent.on(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
+        systemEvent.on(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
+        
+        console.log('键盘鼠标模式已启用');
     }
 
     private setupVirtualJoystickControls(): void {
@@ -118,12 +120,6 @@ export class PlayerShooter extends Component {
 
     private onKeyDown(event: any): void {
         const key = event.keyCode;
-        
-        // 鼠标模式：左键开火（KEY_0代表鼠标左键）
-        if (key === KeyCode.MOUSE_BUTTON_LEFT) {
-            this.fireKeyPressed = true;
-            this.tryFire();
-        }
         
         // R键换弹（两种模式通用）
         if (key === KeyCode.KEY_R) {
@@ -135,43 +131,44 @@ export class PlayerShooter extends Component {
     private onKeyUp(event: any): void {
         const key = event.keyCode;
         
-        if (key === KeyCode.MOUSE_BUTTON_LEFT) {
-            this.fireKeyPressed = false;
-        }
-        
         if (key === KeyCode.KEY_R) {
             this.reloadKeyPressed = false;
         }
     }
 
-    private onMouseMove(event: any): void {
+    private onMouseMove(event: EventMouse): void {
         if (this.useVirtualJoystick) return;
         
         // 计算鼠标方向
         this.updateMouseDirection(event);
     }
 
-    private onMouseDown(event: any): void {
+    private onMouseDown(event: EventMouse): void {
         if (this.useVirtualJoystick) return;
         
-        const key = event.getButton();
-        if (key === EventMouse.BUTTON_LEFT) {
+        const button = event.getButton();
+        if (button === EventMouse.BUTTON_LEFT) {
+            console.log('鼠标左键按下 - 开始射击');
             this.fireKeyPressed = true;
             this.tryFire();
         }
     }
 
-    private onMouseUp(event: any): void {
+    private onMouseUp(event: EventMouse): void {
         if (this.useVirtualJoystick) return;
         
-        const key = event.getButton();
-        if (key === EventMouse.BUTTON_LEFT) {
+        const button = event.getButton();
+        if (button === EventMouse.BUTTON_LEFT) {
+            console.log('鼠标左键释放 - 停止射击');
             this.fireKeyPressed = false;
         }
     }
 
-    private updateMouseDirection(event: any): void {
-        if (!this.mainCamera) return;
+    private updateMouseDirection(event: EventMouse): void {
+        if (!this.mainCamera) {
+            console.warn('未设置主相机，无法计算鼠标方向');
+            return;
+        }
 
         const mousePos = event.getLocation();
         const playerPos = this.node.worldPosition;
@@ -189,6 +186,9 @@ export class PlayerShooter extends Component {
             this.mouseDirection.x = dx / length;
             this.mouseDirection.y = dy / length;
             this.mouseDirection.z = 0;
+            
+            // 调试信息
+            // console.log(`鼠标方向: (${this.mouseDirection.x.toFixed(2)}, ${this.mouseDirection.y.toFixed(2)})`);
         }
     }
 
@@ -360,9 +360,9 @@ export class PlayerShooter extends Component {
             // 键盘鼠标模式清理
             input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
             input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
-            input.off(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
-            input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
-            input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+            systemEvent.off(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
+            systemEvent.off(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
+            systemEvent.off(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
         }
 
         this.unscheduleAllCallbacks();

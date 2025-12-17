@@ -2270,7 +2270,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -250.409,
-      "y": 85.175,
+      "y": 55.707,
       "z": 0
     },
     "_lrot": {
@@ -2407,8 +2407,12 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "shooter": null,
-    "mover": null,
+    "shooter": {
+      "__id__": 71
+    },
+    "mover": {
+      "__id__": 68
+    },
     "joystick": null,
     "dualJoystick": null,
     "maxHealth": 100,
@@ -2424,13 +2428,18 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "bulletPrefab": null,
+    "bulletPrefab": {
+      "__uuid__": "27ecc980-580d-48c1-aae2-d16e94b390d8",
+      "__expectedType__": "cc.Prefab"
+    },
     "bulletSpeed": 800,
     "fireRate": 0.15,
     "maxAmmo": 30,
     "reloadTime": 2,
     "bulletDamage": 25,
-    "mainCamera": null,
+    "mainCamera": {
+      "__id__": 4
+    },
     "fireButton": null,
     "reloadButton": null,
     "virtualJoystick": null,
@@ -2453,7 +2462,7 @@
     "_group": 1,
     "_type": 2,
     "_allowSleep": true,
-    "_gravityScale": 1,
+    "_gravityScale": 0,
     "_linearDamping": 0,
     "_angularDamping": 0,
     "_linearVelocity": {
@@ -2643,7 +2652,7 @@
     "_group": 1,
     "_type": 2,
     "_allowSleep": true,
-    "_gravityScale": 1,
+    "_gravityScale": 0,
     "_linearDamping": 0,
     "_angularDamping": 0,
     "_linearVelocity": {

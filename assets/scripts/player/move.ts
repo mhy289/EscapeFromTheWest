@@ -126,6 +126,11 @@ export class move extends Component {
             // 虚拟摇杆模式：使用摇杆方向
             dx = this.movementDirection.x;
             dy = this.movementDirection.y;
+            
+            // 调试信息
+            if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+                // console.log(`摇杆移动: dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
+            }
         } else {
             // 键盘模式：使用WASD按键
             if (this.moveUp) dy += 1;
@@ -143,10 +148,15 @@ export class move extends Component {
 
         if (dx === 0 && dy === 0) return;
 
-        const pos = this.node.getPosition();
+        const currentPos = this.node.getPosition();
         const moveX = dx * this.speed * deltaTime;
         const moveY = dy * this.speed * deltaTime;
-        this.node.setPosition(pos.x + moveX, pos.y + moveY, pos.z);
+        
+        // 更新位置
+        this.node.setPosition(currentPos.x + moveX, currentPos.y + moveY, currentPos.z);
+        
+        // 调试移动信息
+        // console.log(`角色移动到: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)})`);
     }
 }
 
