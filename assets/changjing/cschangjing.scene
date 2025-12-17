@@ -2457,7 +2457,7 @@
     "node": {
       "__id__": 65
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": null,
     "enabledContactListener": false,
     "bullet": true,
@@ -2485,7 +2485,7 @@
     "node": {
       "__id__": 65
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": null,
     "tag": 0,
     "_group": 1,
