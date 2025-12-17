@@ -78,6 +78,13 @@ export class PlayerShooter extends Component {
     private fireKeyPressed: boolean = false;
     private reloadKeyPressed: boolean = false;
 
+    // 保存绑定的函数引用，用于正确移除监听器
+    private boundOnKeyDown: (keyCode: number) => void = null;
+    private boundOnKeyUp: (keyCode: number) => void = null;
+    private boundOnMouseDown: (button: number, event: EventMouse) => void = null;
+    private boundOnMouseUp: (button: number, event: EventMouse) => void = null;
+    private boundOnMouseMove: (event: EventMouse) => void = null;
+
     protected onLoad(): void {
         // 初始化弹药
         this.currentAmmo = this.maxAmmo;
@@ -108,11 +115,18 @@ export class PlayerShooter extends Component {
         
         // 检查InputManager是否存在，如果不存在则等待
         if (InputManager.instance) {
-            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
-            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
-            InputManager.instance.addMouseDownListener(this.onMouseDown.bind(this));
-            InputManager.instance.addMouseUpListener(this.onMouseUp.bind(this));
-            InputManager.instance.addMouseMoveListener(this.onMouseMove.bind(this));
+            // 创建绑定的函数引用并保存
+            this.boundOnKeyDown = this.onKeyDown.bind(this);
+            this.boundOnKeyUp = this.onKeyUp.bind(this);
+            this.boundOnMouseDown = this.onMouseDown.bind(this);
+            this.boundOnMouseUp = this.onMouseUp.bind(this);
+            this.boundOnMouseMove = this.onMouseMove.bind(this);
+            
+            InputManager.instance.addKeyDownListener(this.boundOnKeyDown);
+            InputManager.instance.addKeyUpListener(this.boundOnKeyUp);
+            InputManager.instance.addMouseDownListener(this.boundOnMouseDown);
+            InputManager.instance.addMouseUpListener(this.boundOnMouseUp);
+            InputManager.instance.addMouseMoveListener(this.boundOnMouseMove);
             console.log('Shot: 键盘鼠标控制设置成功');
         } else {
             console.error('Shot: InputManager实例不存在，尝试延迟重试...');
@@ -166,6 +180,8 @@ export class PlayerShooter extends Component {
     }
 
     private onMouseUp(button: number, event: EventMouse): void {
+        console.log(`Shot: onMouseUp被调用 - 按钮${button}, useVirtualJoystick: ${this.useVirtualJoystick}`);
+        
         if (this.useVirtualJoystick) return;
         
         if (button === EventMouse.BUTTON_LEFT) {
@@ -369,11 +385,26 @@ export class PlayerShooter extends Component {
         } else {
             // 键盘鼠标模式清理
             if (InputManager.instance) {
-                InputManager.instance.removeKeyDownListener(this.onKeyDown.bind(this));
-                InputManager.instance.removeKeyUpListener(this.onKeyUp.bind(this));
-                InputManager.instance.removeMouseDownListener(this.onMouseDown.bind(this));
-                InputManager.instance.removeMouseUpListener(this.onMouseUp.bind(this));
-                InputManager.instance.removeMouseMoveListener(this.onMouseMove.bind(this));
+                if (this.boundOnKeyDown) {
+                    InputManager.instance.removeKeyDownListener(this.boundOnKeyDown);
+                    this.boundOnKeyDown = null;
+                }
+                if (this.boundOnKeyUp) {
+                    InputManager.instance.removeKeyUpListener(this.boundOnKeyUp);
+                    this.boundOnKeyUp = null;
+                }
+                if (this.boundOnMouseDown) {
+                    InputManager.instance.removeMouseDownListener(this.boundOnMouseDown);
+                    this.boundOnMouseDown = null;
+                }
+                if (this.boundOnMouseUp) {
+                    InputManager.instance.removeMouseUpListener(this.boundOnMouseUp);
+                    this.boundOnMouseUp = null;
+                }
+                if (this.boundOnMouseMove) {
+                    InputManager.instance.removeMouseMoveListener(this.boundOnMouseMove);
+                    this.boundOnMouseMove = null;
+                }
             }
         }
 

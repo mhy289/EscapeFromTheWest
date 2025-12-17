@@ -97,14 +97,16 @@ export class InputManager extends Component {
     private onMouseUp(event: EventMouse): void {
         const button = event.getButton();
         this.mouseButtonStates.set(button, false);
-        console.log(`InputManager: 鼠标释放 - 按钮${button}`);
+        console.log(`InputManager: 鼠标释放 - 按钮${button}, 监听器数量: ${this.mouseUpListeners.length}`);
         
         // 通知所有监听器
-        this.mouseUpListeners.forEach(listener => {
+        this.mouseUpListeners.forEach((listener, index) => {
             try {
+                console.log(`InputManager: 调用mouseUp监听器 ${index}`);
                 listener(button, event);
+                console.log(`InputManager: mouseUp监听器 ${index} 执行成功`);
             } catch (error) {
-                console.error('InputManager: mouseUp监听器错误', error);
+                console.error(`InputManager: mouseUp监听器 ${index} 错误`, error);
             }
         });
     }
@@ -156,14 +158,36 @@ export class InputManager extends Component {
     public removeKeyDownListener(listener: (keyCode: number) => void): void {
         const index = this.keyDownListeners.indexOf(listener);
         if (index > -1) {
+            console.log(`InputManager: 移除keyDown监听器，索引 ${index}`);
             this.keyDownListeners.splice(index, 1);
+        } else {
+            console.warn(`InputManager: 未找到要移除的keyDown监听器，当前数量: ${this.keyDownListeners.length}`);
+            // 尝试通过函数内容匹配查找
+            for (let i = 0; i < this.keyDownListeners.length; i++) {
+                if (this.keyDownListeners[i].toString() === listener.toString()) {
+                    console.log(`InputManager: 通过内容匹配找到并移除keyDown监听器，索引 ${i}`);
+                    this.keyDownListeners.splice(i, 1);
+                    break;
+                }
+            }
         }
     }
 
     public removeKeyUpListener(listener: (keyCode: number) => void): void {
         const index = this.keyUpListeners.indexOf(listener);
         if (index > -1) {
+            console.log(`InputManager: 移除keyUp监听器，索引 ${index}`);
             this.keyUpListeners.splice(index, 1);
+        } else {
+            console.warn(`InputManager: 未找到要移除的keyUp监听器，当前数量: ${this.keyUpListeners.length}`);
+            // 尝试通过函数内容匹配查找
+            for (let i = 0; i < this.keyUpListeners.length; i++) {
+                if (this.keyUpListeners[i].toString() === listener.toString()) {
+                    console.log(`InputManager: 通过内容匹配找到并移除keyUp监听器，索引 ${i}`);
+                    this.keyUpListeners.splice(i, 1);
+                    break;
+                }
+            }
         }
     }
 

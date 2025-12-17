@@ -31,6 +31,10 @@ export class move extends Component {
     // 虚拟摇杆移动数据
     private movementDirection: Vec3 = new Vec3(0, 0, 0);
 
+    // 保存绑定的函数引用，用于正确移除监听器
+    private boundOnKeyDown: (keyCode: number) => void = null;
+    private boundOnKeyUp: (keyCode: number) => void = null;
+
     protected onLoad(): void {
         // 延迟设置控制，确保InputManager已经初始化
         this.scheduleOnce(() => {
@@ -54,8 +58,12 @@ export class move extends Component {
         
         // 检查InputManager是否存在，如果不存在则等待
         if (InputManager.instance) {
-            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
-            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
+            // 创建绑定的函数引用并保存
+            this.boundOnKeyDown = this.onKeyDown.bind(this);
+            this.boundOnKeyUp = this.onKeyUp.bind(this);
+            
+            InputManager.instance.addKeyDownListener(this.boundOnKeyDown);
+            InputManager.instance.addKeyUpListener(this.boundOnKeyUp);
             console.log('Move: 键盘控制设置成功');
         } else {
             console.error('Move: InputManager实例不存在，尝试延迟重试...');
@@ -100,8 +108,14 @@ export class move extends Component {
     private cleanupKeyboardControls(): void {
         // 使用InputManager来移除监听器
         if (InputManager.instance) {
-            InputManager.instance.removeKeyDownListener(this.onKeyDown.bind(this));
-            InputManager.instance.removeKeyUpListener(this.onKeyUp.bind(this));
+            if (this.boundOnKeyDown) {
+                InputManager.instance.removeKeyDownListener(this.boundOnKeyDown);
+                this.boundOnKeyDown = null;
+            }
+            if (this.boundOnKeyUp) {
+                InputManager.instance.removeKeyUpListener(this.boundOnKeyUp);
+                this.boundOnKeyUp = null;
+            }
         }
     }
 
