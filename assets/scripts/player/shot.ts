@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, input, Input, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, systemEvent, SystemEvent } from 'cc';
+import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse } from 'cc';
+import { InputManager } from './InputManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerShooter')
@@ -81,8 +82,10 @@ export class PlayerShooter extends Component {
         // 初始化弹药
         this.currentAmmo = this.maxAmmo;
 
-        // 设置控制模式
-        this.setupControlMode();
+        // 延迟设置控制模式，确保InputManager已经初始化
+        this.scheduleOnce(() => {
+            this.setupControlMode();
+        }, 0.1);
     }
 
     protected start(): void {
@@ -101,14 +104,23 @@ export class PlayerShooter extends Component {
     }
 
     private setupKeyboardMouseControls(): void {
-        // 键盘按下事件
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+        console.log('Shot: 设置键盘鼠标控制（使用InputManager）');
         
-        // 鼠标事件 - 使用系统事件
-        systemEvent.on(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
-        systemEvent.on(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
-        systemEvent.on(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
+        // 检查InputManager是否存在，如果不存在则等待
+        if (InputManager.instance) {
+            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
+            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
+            InputManager.instance.addMouseDownListener(this.onMouseDown.bind(this));
+            InputManager.instance.addMouseUpListener(this.onMouseUp.bind(this));
+            InputManager.instance.addMouseMoveListener(this.onMouseMove.bind(this));
+            console.log('Shot: 键盘鼠标控制设置成功');
+        } else {
+            console.error('Shot: InputManager实例不存在，尝试延迟重试...');
+            // 延迟重试
+            this.scheduleOnce(() => {
+                this.setupKeyboardMouseControls();
+            }, 0.2);
+        }
         
         console.log('键盘鼠标模式已启用');
     }
@@ -118,20 +130,18 @@ export class PlayerShooter extends Component {
         this.setupTouchControls();
     }
 
-    private onKeyDown(event: any): void {
-        const key = event.keyCode;
-        
+    private onKeyDown(keyCode: number): void {
         // R键换弹（两种模式通用）
-        if (key === KeyCode.KEY_R) {
+        if (keyCode === KeyCode.KEY_R) {
+            console.log('Shot: R键按下 - 开始换弹');
             this.reloadKeyPressed = true;
             this.tryReload();
         }
     }
 
-    private onKeyUp(event: any): void {
-        const key = event.keyCode;
-        
-        if (key === KeyCode.KEY_R) {
+    private onKeyUp(keyCode: number): void {
+        if (keyCode === KeyCode.KEY_R) {
+            console.log('Shot: R键释放');
             this.reloadKeyPressed = false;
         }
     }
@@ -143,23 +153,23 @@ export class PlayerShooter extends Component {
         this.updateMouseDirection(event);
     }
 
-    private onMouseDown(event: EventMouse): void {
+    private onMouseDown(button: number, event: EventMouse): void {
         if (this.useVirtualJoystick) return;
         
-        const button = event.getButton();
+        console.log(`Shot: 鼠标按下 - 按钮${button}`);
+        
         if (button === EventMouse.BUTTON_LEFT) {
-            console.log('鼠标左键按下 - 开始射击');
+            console.log('Shot: 鼠标左键按下 - 开始射击');
             this.fireKeyPressed = true;
             this.tryFire();
         }
     }
 
-    private onMouseUp(event: EventMouse): void {
+    private onMouseUp(button: number, event: EventMouse): void {
         if (this.useVirtualJoystick) return;
         
-        const button = event.getButton();
         if (button === EventMouse.BUTTON_LEFT) {
-            console.log('鼠标左键释放 - 停止射击');
+            console.log('Shot: 鼠标左键释放 - 停止射击');
             this.fireKeyPressed = false;
         }
     }
@@ -358,11 +368,13 @@ export class PlayerShooter extends Component {
             }
         } else {
             // 键盘鼠标模式清理
-            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
-            systemEvent.off(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
-            systemEvent.off(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
-            systemEvent.off(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
+            if (InputManager.instance) {
+                InputManager.instance.removeKeyDownListener(this.onKeyDown.bind(this));
+                InputManager.instance.removeKeyUpListener(this.onKeyUp.bind(this));
+                InputManager.instance.removeMouseDownListener(this.onMouseDown.bind(this));
+                InputManager.instance.removeMouseUpListener(this.onMouseUp.bind(this));
+                InputManager.instance.removeMouseMoveListener(this.onMouseMove.bind(this));
+            }
         }
 
         this.unscheduleAllCallbacks();

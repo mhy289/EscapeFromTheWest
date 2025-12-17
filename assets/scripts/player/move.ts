@@ -1,5 +1,6 @@
-import { _decorator, Component, Node, input, Input, KeyCode, Vec3 } from 'cc';
+import { _decorator, Component, Node, KeyCode, Vec3 } from 'cc';
 import { DualJoystick, JoystickData } from '../ui/DualJoystick';
+import { InputManager } from './InputManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('move')
@@ -31,10 +32,37 @@ export class move extends Component {
     private movementDirection: Vec3 = new Vec3(0, 0, 0);
 
     protected onLoad(): void {
+        // 延迟设置控制，确保InputManager已经初始化
+        this.scheduleOnce(() => {
+            this.setupControls();
+        }, 0.1);
+    }
+
+    private setupControls(): void {
+        console.log('Move: 开始设置控制，当前模式：', this.useVirtualJoystick ? '虚拟摇杆' : '键盘');
+        console.log('Move: InputManager.instance =', InputManager.instance ? '存在' : '不存在');
+        
         if (this.useVirtualJoystick) {
             this.setupVirtualJoystick();
         } else {
             this.setupKeyboardControls();
+        }
+    }
+
+    private setupKeyboardControls(): void {
+        console.log('Move: 设置键盘控制（使用InputManager）');
+        
+        // 检查InputManager是否存在，如果不存在则等待
+        if (InputManager.instance) {
+            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
+            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
+            console.log('Move: 键盘控制设置成功');
+        } else {
+            console.error('Move: InputManager实例不存在，尝试延迟重试...');
+            // 延迟重试
+            this.scheduleOnce(() => {
+                this.setupKeyboardControls();
+            }, 0.2);
         }
     }
 
@@ -47,8 +75,15 @@ export class move extends Component {
     }
 
     private setupKeyboardControls(): void {
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+        console.log('Move: 设置键盘控制（使用InputManager）');
+        
+        // 使用InputManager来监听键盘事件
+        if (InputManager.instance) {
+            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
+            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
+        } else {
+            console.error('Move: InputManager实例不存在！');
+        }
     }
 
     private setupVirtualJoystick(): void {
@@ -63,8 +98,11 @@ export class move extends Component {
     }
 
     private cleanupKeyboardControls(): void {
-        input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
+        // 使用InputManager来移除监听器
+        if (InputManager.instance) {
+            InputManager.instance.removeKeyDownListener(this.onKeyDown.bind(this));
+            InputManager.instance.removeKeyUpListener(this.onKeyUp.bind(this));
+        }
     }
 
     private cleanupVirtualJoystick(): void {
@@ -74,29 +112,41 @@ export class move extends Component {
         }
     }
 
-    private onKeyDown(event: any) {
-        const key = event.keyCode;
-        if (key === KeyCode.KEY_W) {
+    private onKeyDown(keyCode: number) {
+        console.log(`Move: 按键按下 - ${this.getKeyName(keyCode)}`);
+        
+        if (keyCode === KeyCode.KEY_W) {
             this.moveUp = true;
-        } else if (key === KeyCode.KEY_S) {
+        } else if (keyCode === KeyCode.KEY_S) {
             this.moveDown = true;
-        } else if (key === KeyCode.KEY_A) {
+        } else if (keyCode === KeyCode.KEY_A) {
             this.moveLeft = true;
-        } else if (key === KeyCode.KEY_D) {
+        } else if (keyCode === KeyCode.KEY_D) {
             this.moveRight = true;
         }
     }
 
-    private onKeyUp(event: any) {
-        const key = event.keyCode;
-        if (key === KeyCode.KEY_W) {
+    private onKeyUp(keyCode: number) {
+        console.log(`Move: 按键释放 - ${this.getKeyName(keyCode)}`);
+        
+        if (keyCode === KeyCode.KEY_W) {
             this.moveUp = false;
-        } else if (key === KeyCode.KEY_S) {
+        } else if (keyCode === KeyCode.KEY_S) {
             this.moveDown = false;
-        } else if (key === KeyCode.KEY_A) {
+        } else if (keyCode === KeyCode.KEY_A) {
             this.moveLeft = false;
-        } else if (key === KeyCode.KEY_D) {
+        } else if (keyCode === KeyCode.KEY_D) {
             this.moveRight = false;
+        }
+    }
+
+    private getKeyName(keyCode: number): string {
+        switch(keyCode) {
+            case KeyCode.KEY_W: return 'W';
+            case KeyCode.KEY_S: return 'S';
+            case KeyCode.KEY_A: return 'A';
+            case KeyCode.KEY_D: return 'D';
+            default: return `KeyCode(${keyCode})`;
         }
     }
 
@@ -129,10 +179,12 @@ export class move extends Component {
             
             // 调试信息
             if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
-                // console.log(`摇杆移动: dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
+                console.log(`摇杆移动: dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
             }
         } else {
             // 键盘模式：使用WASD按键
+            console.log(`Move: 按键状态 - Up:${this.moveUp} Down:${this.moveDown} Left:${this.moveLeft} Right:${this.moveRight}`);
+            
             if (this.moveUp) dy += 1;
             if (this.moveDown) dy -= 1;
             if (this.moveRight) dx += 1;
@@ -144,19 +196,26 @@ export class move extends Component {
                 dx = dx / len;
                 dy = dy / len;
             }
+            
+            console.log(`Move: 计算得到的移动方向 - dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
         }
 
-        if (dx === 0 && dy === 0) return;
+        if (dx === 0 && dy === 0) {
+            console.log('Move: 没有移动输入，跳过更新');
+            return;
+        }
 
         const currentPos = this.node.getPosition();
         const moveX = dx * this.speed * deltaTime;
         const moveY = dy * this.speed * deltaTime;
         
+        console.log(`Move: 当前位置 (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}), 移动距离 (${moveX.toFixed(2)}, ${moveY.toFixed(2)})`);
+        
         // 更新位置
         this.node.setPosition(currentPos.x + moveX, currentPos.y + moveY, currentPos.z);
         
-        // 调试移动信息
-        // console.log(`角色移动到: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)})`);
+        const newPos = this.node.getPosition();
+        console.log(`Move: 移动后位置 (${newPos.x.toFixed(1)}, ${newPos.y.toFixed(1)})`);
     }
 }
 
