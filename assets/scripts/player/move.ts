@@ -82,18 +82,6 @@ export class move extends Component {
         }
     }
 
-    private setupKeyboardControls(): void {
-        console.log('Move: 设置键盘控制（使用InputManager）');
-        
-        // 使用InputManager来监听键盘事件
-        if (InputManager.instance) {
-            InputManager.instance.addKeyDownListener(this.onKeyDown.bind(this));
-            InputManager.instance.addKeyUpListener(this.onKeyUp.bind(this));
-        } else {
-            console.error('Move: InputManager实例不存在！');
-        }
-    }
-
     private setupVirtualJoystick(): void {
         if (!this.dualJoystick) {
             console.error('Move: 虚拟摇杆模式需要设置DualJoystick引用！');
@@ -197,8 +185,6 @@ export class move extends Component {
             }
         } else {
             // 键盘模式：使用WASD按键
-            console.log(`Move: 按键状态 - Up:${this.moveUp} Down:${this.moveDown} Left:${this.moveLeft} Right:${this.moveRight}`);
-            
             if (this.moveUp) dy += 1;
             if (this.moveDown) dy -= 1;
             if (this.moveRight) dx += 1;
@@ -211,25 +197,82 @@ export class move extends Component {
                 dy = dy / len;
             }
             
-            console.log(`Move: 计算得到的移动方向 - dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
+            // 只在有输入时输出调试信息
+            if (dx !== 0 || dy !== 0) {
+                console.log(`Move: 按键状态 - Up:${this.moveUp} Down:${this.moveDown} Left:${this.moveLeft} Right:${this.moveRight}`);
+                console.log(`Move: 计算得到的移动方向 - dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}`);
+            }
         }
 
+        // 重置速度状态
+        this.resetVelocity();
+        
         if (dx === 0 && dy === 0) {
-            console.log('Move: 没有移动输入，跳过更新');
+            // 没有输入时确保完全停止
             return;
         }
 
+        this.applyMovement(dx, dy, deltaTime);
+    }
+
+    private resetVelocity(): void {
+        // 如果节点有刚体组件，重置速度
+        const rigidBody = this.node.getComponent('RigidBody');
+        if (rigidBody) {
+            // 重置线性速度，确保没有残留运动
+            rigidBody.setLinearVelocity(0, 0, 0);
+            rigidBody.setAngularVelocity(0, 0, 0);
+        }
+    }
+
+    private applyMovement(dx: number, dy: number, deltaTime: number): void {
         const currentPos = this.node.getPosition();
         const moveX = dx * this.speed * deltaTime;
         const moveY = dy * this.speed * deltaTime;
         
         console.log(`Move: 当前位置 (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}), 移动距离 (${moveX.toFixed(2)}, ${moveY.toFixed(2)})`);
         
-        // 更新位置
-        this.node.setPosition(currentPos.x + moveX, currentPos.y + moveY, currentPos.z);
-        
-        const newPos = this.node.getPosition();
-        console.log(`Move: 移动后位置 (${newPos.x.toFixed(1)}, ${newPos.y.toFixed(1)})`);
+        // 检查是否有刚体组件
+        const rigidBody = this.node.getComponent('RigidBody');
+        if (rigidBody) {
+            // 使用刚体移动，避免物理冲突
+            const velocity = new Vec3(dx * this.speed, dy * this.speed, 0);
+            rigidBody.setLinearVelocity(velocity.x, velocity.y, velocity.z);
+            console.log(`Move: 使用刚体移动，速度 (${velocity.x.toFixed(2)}, ${velocity.y.toFixed(2)})`);
+        } else {
+            // 直接修改位置（非物理移动）
+            this.node.setPosition(currentPos.x + moveX, currentPos.y + moveY, currentPos.z);
+            const newPos = this.node.getPosition();
+            console.log(`Move: 移动后位置 (${newPos.x.toFixed(1)}, ${newPos.y.toFixed(1)})`);
+        }
+    }
+
+    // 公共方法：强制停止所有移动（用于调试）
+    public forceStopMovement(): void {
+        console.log('Move: 强制停止移动');
+        this.moveUp = false;
+        this.moveDown = false;
+        this.moveLeft = false;
+        this.moveRight = false;
+        this.movementDirection = new Vec3(0, 0, 0);
+        this.resetVelocity();
+    }
+
+    // 公共方法：获取移动状态（用于调试）
+    public getMovementState(): any {
+        return {
+            keyboard: {
+                up: this.moveUp,
+                down: this.moveDown,
+                left: this.moveLeft,
+                right: this.moveRight
+            },
+            joystick: {
+                x: this.movementDirection.x,
+                y: this.movementDirection.y
+            },
+            position: this.node.getPosition()
+        };
     }
 }
 
