@@ -2443,7 +2443,7 @@
       "__uuid__": "27ecc980-580d-48c1-aae2-d16e94b390d8",
       "__expectedType__": "cc.Prefab"
     },
-    "bulletSpeed": 800,
+    "bulletSpeed": 8,
     "fireRate": 0.15,
     "maxAmmo": 30,
     "reloadTime": 2,
