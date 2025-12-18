@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3, Collider, RigidBody, find } from 'cc';
+import { _decorator, Component, Node, Vec3, Vec2, Collider, RigidBody, Collider2D, RigidBody2D, find } from 'cc';
 import { Enemy } from '../enemy/Enemy';
 import { testmove } from '../enemy/testmove';
 const { ccclass, property } = _decorator;
@@ -13,28 +13,49 @@ export class Bullet extends Component {
     private currentTime: number = 0;
 
     private rigidBody: RigidBody = null;
+    private rigidBody2D: RigidBody2D = null;
     private collider: Collider = null;
+    private collider2D: Collider2D = null;
 
     protected onLoad(): void {
-        // 获取物理组件
+        // 获取物理组件（优先使用2D组件）
         this.rigidBody = this.node.getComponent(RigidBody);
+        this.rigidBody2D = this.node.getComponent(RigidBody2D);
         this.collider = this.node.getComponent(Collider);
+        this.collider2D = this.node.getComponent(Collider2D);
 
         // 设置子弹为触发器
         if (this.collider) {
             this.collider.isTrigger = true;
         }
+        if (this.collider2D) {
+            this.collider2D.sensor = true;
+        }
+
+        console.log(`Bullet组件加载 - 3D刚体: ${this.rigidBody ? '✅' : '❌'}, 2D刚体: ${this.rigidBody2D ? '✅' : '❌'}, 3D碰撞体: ${this.collider ? '✅' : '❌'}, 2D碰撞体: ${this.collider2D ? '✅' : '❌'}`);
     }
 
     protected start(): void {
-        // 如果有刚体组件，设置速度
-        if (this.rigidBody) {
+        console.log(`Bullet start: 方向(${this.direction.x.toFixed(2)}, ${this.direction.y.toFixed(2)}), 3D刚体: ${this.rigidBody ? '是' : '否'}, 2D刚体: ${this.rigidBody2D ? '是' : '否'}`);
+        
+        // 优先使用2D刚体（更常见）
+        if (this.rigidBody2D) {
+            const velocity = new Vec2(
+                this.direction.x * this.speed,
+                this.direction.y * this.speed
+            );
+            this.rigidBody2D.linearVelocity = velocity;
+            console.log(`设置2D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
+        }
+        // 备用：使用3D刚体
+        else if (this.rigidBody) {
             const velocity = new Vec3(
                 this.direction.x * this.speed,
                 this.direction.y * this.speed,
                 0
             );
             this.rigidBody.setLinearVelocity(velocity);
+            console.log(`设置3D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
         }
     }
 
@@ -48,23 +69,81 @@ export class Bullet extends Component {
         Vec3.normalize(this.direction, this.direction);
 
         console.log(`子弹初始化: 方向(${this.direction.x.toFixed(2)}, ${this.direction.y.toFixed(2)}), 速度${speed}, 伤害${damage}`);
+
+        // 立即应用移动（不等待start）
+        this.applyMovement();
+    }
+
+    // 应用移动逻辑
+    private applyMovement(): void {
+        // 优先使用2D刚体系统
+        if (this.rigidBody2D) {
+            const velocity = new Vec2(
+                this.direction.x * this.speed,
+                this.direction.y * this.speed
+            );
+            this.rigidBody2D.linearVelocity = velocity;
+            console.log(`立即设置2D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
+        }
+        // 备用：使用3D刚体系统
+        else if (this.rigidBody) {
+            const velocity = new Vec3(
+                this.direction.x * this.speed,
+                this.direction.y * this.speed,
+                0
+            );
+            this.rigidBody.setLinearVelocity(velocity);
+            console.log(`立即设置3D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
+        } else {
+            console.log('子弹没有刚体组件，将使用手动移动');
+        }
     }
 
     protected update(deltaTime: number): void {
         this.currentTime += deltaTime;
 
-        // 手动移动（如果没有刚体组件）
-        if (!this.rigidBody) {
+        // 手动移动（如果没有刚体组件或有刚体但速度为0）
+        if ((!this.rigidBody && !this.rigidBody2D) || this.isVelocityZero()) {
             const pos = this.node.getPosition();
             const moveX = this.direction.x * this.speed * deltaTime;
             const moveY = this.direction.y * this.speed * deltaTime;
-            this.node.setPosition(pos.x + moveX, pos.y + moveY, pos.z);
+            const newPos = new Vec3(pos.x + moveX, pos.y + moveY, pos.z);
+            this.node.setPosition(newPos);
+            
+            // 调试信息
+            if (this.currentTime < 0.5) { // 只在前0.5秒显示调试信息
+                console.log(`手动移动: 从(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) 到(${newPos.x.toFixed(1)}, ${newPos.y.toFixed(1)})`);
+            }
+        } else {
+            // 调试刚体速度
+            if (this.currentTime < 0.5) {
+                if (this.rigidBody2D) {
+                    const velocity = this.rigidBody2D.linearVelocity;
+                    console.log(`2D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
+                } else if (this.rigidBody) {
+                    const velocity = this.rigidBody.getLinearVelocity();
+                    console.log(`3D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
+                }
+            }
         }
 
         // 生命周期结束时销毁子弹
         if (this.currentTime >= this.lifetime) {
             this.destroyBullet();
         }
+    }
+
+    // 检查刚体速度是否为0
+    private isVelocityZero(): boolean {
+        if (this.rigidBody2D) {
+            const velocity = this.rigidBody2D.linearVelocity;
+            return Math.abs(velocity.x) < 0.1 && Math.abs(velocity.y) < 0.1;
+        }
+        if (this.rigidBody) {
+            const velocity = this.rigidBody.getLinearVelocity();
+            return Math.abs(velocity.x) < 0.1 && Math.abs(velocity.y) < 0.1;
+        }
+        return true;
     }
 
     protected onTriggerEnter(other: Node): void {
@@ -79,6 +158,22 @@ export class Bullet extends Component {
         }
         else if (enemyTag.includes('wall') || enemyTag.includes('障碍')) {
             console.log('子弹击中墙壁');
+            this.destroyBullet();
+        }
+    }
+
+    // 2D碰撞检测
+    protected onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: any): void {
+        const otherNode = otherCollider.node;
+        
+        // 检查是否击中敌人
+        if (this.isEnemy(otherNode)) {
+            console.log(`2D子弹击中敌人: ${otherNode.name}`);
+            this.dealDamage(otherNode);
+            this.destroyBullet();
+        }
+        else if (otherNode.name.toLowerCase().includes('wall') || otherNode.name.toLowerCase().includes('障碍')) {
+            console.log('2D子弹击中墙壁');
             this.destroyBullet();
         }
     }

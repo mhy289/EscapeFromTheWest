@@ -1,5 +1,6 @@
 import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, find } from 'cc';
 import { InputManager } from './InputManager';
+import { Bullet } from './Bullet';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerShooter')
@@ -303,10 +304,25 @@ export class PlayerShooter extends Component {
         // 计算射击方向
         const direction = this.getFireDirection();
         
-        // 设置子弹速度和方向（这里需要在子弹脚本中实现）
-        const bulletScript = bullet.getComponent('Bullet');
+        console.log(`发射子弹: 位置(${this.node.getPosition().x.toFixed(1)}, ${this.node.getPosition().y.toFixed(1)}), 方向(${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
+        
+        // 设置子弹速度和方向
+        const bulletScript = bullet.getComponent(Bullet);
         if (bulletScript) {
             bulletScript.initialize(direction, this.bulletSpeed, this.bulletDamage);
+            console.log('子弹初始化成功');
+        } else {
+            console.warn('子弹预制体没有Bullet组件，尝试添加...');
+            // 尝试动态添加Bullet组件
+            const addedScript = bullet.addComponent(Bullet);
+            if (addedScript) {
+                addedScript.initialize(direction, this.bulletSpeed, this.bulletDamage);
+                console.log('动态添加Bullet组件并初始化成功');
+            } else {
+                console.error('无法添加Bullet组件，销毁子弹');
+                bullet.destroy();
+                return;
+            }
         }
 
         // 将子弹添加到场景中
@@ -514,5 +530,35 @@ export class PlayerShooter extends Component {
     public addAmmo(amount: number): void {
         this.currentAmmo = Math.min(this.currentAmmo + amount, this.maxAmmo);
         console.log(`获得弹药 ${amount}，当前弹药: ${this.currentAmmo}/${this.maxAmmo}`);
+    }
+
+    // 测试方法：向固定方向发射子弹（用于调试）
+    public testFireFixedDirection(direction: Vec3 = new Vec3(1, 0, 0)): void {
+        if (!this.bulletPrefab) {
+            console.error('子弹预制体未设置！');
+            return;
+        }
+
+        // 创建子弹
+        const bullet = instantiate(this.bulletPrefab);
+        
+        // 设置子弹位置（玩家当前位置）
+        bullet.setPosition(this.node.getPosition());
+
+        console.log(`测试发射子弹: 位置(${this.node.getPosition().x.toFixed(1)}, ${this.node.getPosition().y.toFixed(1)}), 固定方向(${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
+        
+        // 设置子弹速度和方向
+        const bulletScript = bullet.getComponent(Bullet);
+        if (bulletScript) {
+            bulletScript.initialize(direction, this.bulletSpeed, this.bulletDamage);
+            console.log('测试子弹初始化成功');
+        } else {
+            console.error('子弹预制体没有Bullet组件！');
+            bullet.destroy();
+            return;
+        }
+
+        // 将子弹添加到场景中
+        this.node.parent.addChild(bullet);
     }
 }

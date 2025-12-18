@@ -1,7 +1,8 @@
-import { _decorator, Component, Node, Prefab, instantiate, Vec3, KeyCode } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, Vec3, KeyCode, find } from 'cc';
 import { Bullet } from '../player/Bullet';
 import { Enemy } from '../enemy/Enemy';
 import { testmove } from '../enemy/testmove';
+import { PlayerShooter } from '../player/shot';
 const { ccclass, property } = _decorator;
 
 /**
@@ -21,10 +22,31 @@ export class WeaponTest extends Component {
     })
     enemyPrefab: Prefab = null;
 
+    @property({
+        tooltip: '是否使用PlayerShooter组件进行测试'
+    })
+    usePlayerShooter: boolean = true;
+
     private testEnemies: Node[] = [];
+    private playerShooter: PlayerShooter = null;
 
     protected start(): void {
         console.log('武器测试初始化');
+        
+        // 如果使用PlayerShooter，获取组件引用
+        if (this.usePlayerShooter) {
+            const player = find('Canvas/Player');
+            if (player) {
+                this.playerShooter = player.getComponent(PlayerShooter);
+                if (this.playerShooter) {
+                    console.log('找到PlayerShooter组件，将使用其发射系统');
+                } else {
+                    console.warn('Player节点没有PlayerShooter组件，将使用独立发射系统');
+                    this.usePlayerShooter = false;
+                }
+            }
+        }
+        
         this.createTestEnemies();
     }
 
@@ -79,48 +101,77 @@ export class WeaponTest extends Component {
 
     // 测试发射子弹
     private testFire(): void {
-        if (!this.bulletPrefab) {
-            console.error('未设置子弹预制体！');
-            return;
-        }
+        console.log('触发测试发射');
 
-        // 创建子弹
-        const bullet = instantiate(this.bulletPrefab);
-        bullet.setPosition(this.node.getPosition());
-
-        // 设置子弹朝向第一个敌人（固定方向测试）
-        if (this.testEnemies.length > 0) {
-            const targetEnemy = this.testEnemies[0];
-            const enemyPos = targetEnemy.worldPosition;
-            const playerPos = this.node.worldPosition;
+        if (this.usePlayerShooter && this.playerShooter) {
+            // 使用PlayerShooter的测试方法
+            console.log('使用PlayerShooter测试发射');
             
-            // 计算方向
-            let direction = new Vec3(
-                enemyPos.x - playerPos.x,
-                enemyPos.y - playerPos.y,
-                0
-            );
-            
-            // 归一化
-            Vec3.normalize(direction, direction);
-
-            // 初始化子弹
-            const bulletScript = bullet.getComponent(Bullet);
-            if (bulletScript) {
-                bulletScript.initialize(direction, 800, 25);
+            if (this.testEnemies.length > 0) {
+                const targetEnemy = this.testEnemies[0];
+                const enemyPos = targetEnemy.worldPosition;
+                const playerPos = this.playerShooter.node.worldPosition;
+                
+                // 计算方向
+                let direction = new Vec3(
+                    enemyPos.x - playerPos.x,
+                    enemyPos.y - playerPos.y,
+                    0
+                );
+                
+                // 归一化
+                Vec3.normalize(direction, direction);
+                
+                this.playerShooter.testFireFixedDirection(direction);
+            } else {
+                // 没有敌人时，向右发射
+                this.playerShooter.testFireFixedDirection(new Vec3(1, 0, 0));
             }
-
-            console.log(`测试发射子弹朝向敌人，方向: (${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
         } else {
-            // 没有敌人时，向右发射
-            const direction = new Vec3(1, 0, 0);
-            const bulletScript = bullet.getComponent(Bullet);
-            if (bulletScript) {
-                bulletScript.initialize(direction, 800, 25);
+            // 使用独立发射系统
+            console.log('使用独立发射系统');
+            if (!this.bulletPrefab) {
+                console.error('未设置子弹预制体！');
+                return;
             }
-        }
 
-        this.node.addChild(bullet);
+            const bullet = instantiate(this.bulletPrefab);
+            bullet.setPosition(this.node.getPosition());
+
+            // 设置子弹朝向第一个敌人（固定方向测试）
+            if (this.testEnemies.length > 0) {
+                const targetEnemy = this.testEnemies[0];
+                const enemyPos = targetEnemy.worldPosition;
+                const playerPos = this.node.worldPosition;
+                
+                // 计算方向
+                let direction = new Vec3(
+                    enemyPos.x - playerPos.x,
+                    enemyPos.y - playerPos.y,
+                    0
+                );
+                
+                // 归一化
+                Vec3.normalize(direction, direction);
+
+                // 初始化子弹
+                const bulletScript = bullet.getComponent(Bullet);
+                if (bulletScript) {
+                    bulletScript.initialize(direction, 800, 25);
+                }
+
+                console.log(`测试发射子弹朝向敌人，方向: (${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
+            } else {
+                // 没有敌人时，向右发射
+                const direction = new Vec3(1, 0, 0);
+                const bulletScript = bullet.getComponent(Bullet);
+                if (bulletScript) {
+                    bulletScript.initialize(direction, 800, 25);
+                }
+            }
+
+            this.node.addChild(bullet);
+        }
     }
 
     // 清理测试敌人
