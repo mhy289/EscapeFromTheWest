@@ -2380,7 +2380,7 @@
     "_enabled": true,
     "__prefab": null,
     "speed": 100,
-    "useVirtualJoystick": false,
+    "useVirtualJoystick": true,
     "_id": "17SU2A+UxHYaIIk0jboqDs"
   },
   {
