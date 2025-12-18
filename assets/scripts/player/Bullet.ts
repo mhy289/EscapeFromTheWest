@@ -67,8 +67,19 @@ export class Bullet extends Component {
 
         // 归一化方向向量
         Vec3.normalize(this.direction, this.direction);
+        
+        // 调整子弹朝向：预制体的x负方向是头部，需要将子弹旋转到正确的朝向
+        // 计算子弹应该朝向的角度
+        const targetAngle = Math.atan2(this.direction.y, this.direction.x);
+        // 由于预制体的x负方向是头部，需要将方向向量反转
+        this.direction.x = -this.direction.x;
+        this.direction.y = -this.direction.y;
+        
+        // 设置子弹节点的旋转角度
+        this.node.angle = targetAngle * (180 / Math.PI);
 
-        console.log(`子弹初始化: 方向(${this.direction.x.toFixed(2)}, ${this.direction.y.toFixed(2)}), 速度${speed}, 伤害${damage}`);
+        console.log(`子弹初始化: 原始方向(${direction.x.toFixed(2)}, ${direction.y.toFixed(2)}), 调整后方向(${this.direction.x.toFixed(2)}, ${this.direction.y.toFixed(2)}), 旋转角度${(this.node.angle).toFixed(1)}°, 速度${speed}, 伤害${damage}`);
+        console.log(`✨ 子弹朝向已调整：预制体x负方向为头部，方向向量已反转`);
 
         // 立即应用移动（不等待start）
         this.applyMovement();
