@@ -1,3 +1,4 @@
+/*
 import { _decorator, Component, Node, Label, Button, input, Input } from 'cc';
 import { PlayerShooter } from '../player/shot';
 import { VirtualJoystick } from './VirtualJoystick';
@@ -315,5 +316,108 @@ export class GameUI extends Component {
         if (this.reloadButton) {
             this.reloadButton.off(Input.EventType.TOUCH_START, this.onReloadButtonPressed, this);
         }
+    }
+}
+    */
+
+import { _decorator, Component, Node, Label, input, Input, Vec3 } from 'cc';
+import { PlayerShooter } from '../player/shot';
+import { UIJoyStick } from './UIJoyStick';
+import { VirtualInput } from '../input/VirtualInput';
+const { ccclass, property } = _decorator;
+
+@ccclass('GameUI')
+export class GameUI extends Component {
+    @property({ type: Node }) fireButton: Node = null;
+    @property({ type: Node }) reloadButton: Node = null;
+    @property({ type: Label }) ammoLabel: Label = null;
+    @property({ type: Label }) healthLabel: Label = null;
+    @property({ type: Node }) joystickNode: Node = null;
+    @property({ type: Node }) keyboardUI: Node = null;
+    @property({ type: Node }) virtualJoystickUI: Node = null;
+
+    @property({ type: PlayerShooter }) playerShooter: PlayerShooter = null;
+    private joystick: UIJoyStick = null;
+    private ammoUpdateInterval: number = 0;
+
+    protected onLoad(): void {
+        if (!this.joystickNode) return;
+        this.joystick = this.joystickNode.getComponent(UIJoyStick);
+
+        this.setupUIEvents();
+        this.setupUIMode();
+    }
+
+    private setupUIEvents(): void {
+        if (this.fireButton) {
+            this.fireButton.on(Input.EventType.TOUCH_START, () => {
+                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = true;
+            });
+            this.fireButton.on(Input.EventType.TOUCH_END, () => {
+                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = false;
+            });
+            this.fireButton.on(Input.EventType.TOUCH_CANCEL, () => {
+                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = false;
+            });
+        }
+
+        if (this.reloadButton) {
+            this.reloadButton.on(Input.EventType.TOUCH_START, () => {
+                if (this.playerShooter) this.playerShooter['tryReload']();
+            });
+        }
+    }
+
+    private setupUIMode(): void {
+        const useVirtualJoystick = this.playerShooter ? this.playerShooter['useVirtualJoystick'] : false;
+        this.showVirtualJoystickUI(useVirtualJoystick);
+        this.showKeyboardUI(!useVirtualJoystick);
+    }
+
+    private showKeyboardUI(show: boolean): void {
+        if (this.keyboardUI) this.keyboardUI.active = show;
+    }
+
+    private showVirtualJoystickUI(show: boolean): void {
+        if (this.virtualJoystickUI) this.virtualJoystickUI.active = show;
+        if (this.joystickNode) this.joystickNode.active = show;
+        if (this.fireButton) this.fireButton.active = show;
+        if (this.reloadButton) this.reloadButton.active = show;
+    }
+
+    protected update(deltaTime: number): void {
+        this.ammoUpdateInterval += deltaTime;
+        if (this.ammoUpdateInterval >= 0.1) {
+            this.updateAmmoDisplay();
+            this.ammoUpdateInterval = 0;
+        }
+
+        // 单摇杆模式下更新射击方向
+        if (this.playerShooter && this.joystick) {
+            const x = VirtualInput.horizontal;
+            const y = VirtualInput.vertical;
+            if (x !== 0 || y !== 0) {
+                const angle = Math.atan2(y, x);
+                this.playerShooter.setJoystickAngle(angle);
+            }
+        }
+    }
+
+    private updateAmmoDisplay(): void {
+        if (this.ammoLabel && this.playerShooter) {
+            const ammoInfo = this.playerShooter.getAmmoInfo();
+            this.ammoLabel.string = ammoInfo.isReloading ? '换弹中...' : `${ammoInfo.current}/${ammoInfo.max}`;
+        }
+    }
+
+    public updateHealthDisplay(current: number, max: number): void {
+        if (this.healthLabel) this.healthLabel.string = `${current}/${max}`;
+    }
+
+    protected onDestroy(): void {
+        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_START);
+        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_END);
+        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_CANCEL);
+        if (this.reloadButton) this.reloadButton.off(Input.EventType.TOUCH_START);
     }
 }
