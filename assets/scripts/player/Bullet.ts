@@ -1,4 +1,6 @@
-import { _decorator, Component, Node, Vec3, Collider, RigidBody } from 'cc';
+import { _decorator, Component, Node, Vec3, Collider, RigidBody, find } from 'cc';
+import { Enemy } from '../enemy/Enemy';
+import { testmove } from '../enemy/testmove';
 const { ccclass, property } = _decorator;
 
 @ccclass('Bullet')
@@ -69,23 +71,50 @@ export class Bullet extends Component {
         // 检查碰撞对象
         const enemyTag = other.name.toLowerCase();
         
-        if (enemyTag.includes('enemy') || enemyTag.includes('怪物')) {
-            // 对敌人造成伤害
+        // 检查是否击中敌人
+        if (this.isEnemy(other)) {
+            console.log(`子弹击中敌人: ${other.name}`);
             this.dealDamage(other);
             this.destroyBullet();
         }
-        else if (other.name.toLowerCase().includes('wall') || other.name.toLowerCase().includes('障碍')) {
-            // 击中墙壁，销毁子弹
+        else if (enemyTag.includes('wall') || enemyTag.includes('障碍')) {
+            console.log('子弹击中墙壁');
             this.destroyBullet();
         }
     }
 
+    // 判断是否是敌人
+    private isEnemy(node: Node): boolean {
+        // 检查节点名称
+        const nodeName = node.name.toLowerCase();
+        if (nodeName.includes('enemy') || nodeName.includes('怪物')) {
+            return true;
+        }
+
+        // 检查是否有敌人相关组件
+        if (node.getComponent(Enemy) || node.getComponent(testmove)) {
+            return true;
+        }
+
+        return false;
+    }
+
     private dealDamage(target: Node): void {
-        const enemyScript = target.getComponent('Enemy');
+        // 优先使用Enemy组件
+        let enemyScript = target.getComponent(Enemy);
         if (enemyScript && typeof enemyScript.takeDamage === 'function') {
             enemyScript.takeDamage(this.damage);
-            console.log(`子弹对敌人造成 ${this.damage} 点伤害`);
+            return;
         }
+
+        // 备用：使用testmove组件的伤害方法
+        enemyScript = target.getComponent(testmove);
+        if (enemyScript && typeof enemyScript.takeDamage === 'function') {
+            enemyScript.takeDamage(this.damage);
+            return;
+        }
+
+        console.log(`找到敌人但无法造成伤害: ${target.name}`);
     }
 
     private destroyBullet(): void {

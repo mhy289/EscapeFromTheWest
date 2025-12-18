@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse } from 'cc';
+import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, find } from 'cc';
 import { InputManager } from './InputManager';
 const { ccclass, property } = _decorator;
 
@@ -77,6 +77,17 @@ export class PlayerShooter extends Component {
     // 按键状态
     private fireKeyPressed: boolean = false;
     private reloadKeyPressed: boolean = false;
+
+    // 敌人追踪模式
+    @property({
+        tooltip: '是否启用敌人追踪模式：true=子弹自动射向最近的敌人，false=正常方向射击'
+    })
+    autoAimMode: boolean = true;
+
+    @property({
+        tooltip: '敌人追踪范围：在此范围内的敌人会被追踪（像素单位）'
+    })
+    aimRange: number = 1000;
 
     // 保存绑定的函数引用，用于正确移除监听器
     private boundOnKeyDown: (keyCode: number) => void = null;
@@ -325,6 +336,16 @@ export class PlayerShooter extends Component {
     }
 
     private getFireDirection(): Vec3 {
+        // 如果启用了敌人追踪模式，优先射向最近的敌人
+        if (this.autoAimMode) {
+            const enemyDirection = this.getNearestEnemyDirection();
+            if (enemyDirection) {
+                console.log(`瞄准敌人: 方向(${enemyDirection.x.toFixed(2)}, ${enemyDirection.y.toFixed(2)})`);
+                return enemyDirection;
+            }
+        }
+
+        // 否则使用正常射击方向
         if (this.useVirtualJoystick) {
             // 虚拟摇杆模式：使用摇杆方向
             const x = Math.cos(this.joystickAngle);
@@ -333,6 +354,75 @@ export class PlayerShooter extends Component {
         } else {
             // 键盘鼠标模式：使用鼠标方向
             return Vec3.clone(this.mouseDirection);
+        }
+    }
+
+    // 获取最近敌人的方向
+    private getNearestEnemyDirection(): Vec3 | null {
+        // 查找场景中所有敌人
+        const enemies: Node[] = [];
+        
+        // 递归搜索所有节点寻找敌人
+        this.findEnemies(find('Canvas'), enemies);
+        
+        if (enemies.length === 0) {
+            console.log('未找到敌人');
+            return null;
+        }
+
+        // 找到最近的敌人
+        let nearestEnemy: Node | null = null;
+        let minDistance = Infinity;
+        const playerPos = this.node.worldPosition;
+
+        for (const enemy of enemies) {
+            const enemyPos = enemy.worldPosition;
+            const dx = enemyPos.x - playerPos.x;
+            const dy = enemyPos.y - playerPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // 检查是否在追踪范围内
+            if (distance <= this.aimRange && distance < minDistance) {
+                minDistance = distance;
+                nearestEnemy = enemy;
+            }
+        }
+
+        if (!nearestEnemy) {
+            console.log(`范围内(${this.aimRange})未找到敌人`);
+            return null;
+        }
+
+        // 计算方向向量
+        const enemyPos = nearestEnemy.worldPosition;
+        let direction = new Vec3(
+            enemyPos.x - playerPos.x,
+            enemyPos.y - playerPos.y,
+            0
+        );
+
+        // 归一化方向向量
+        Vec3.normalize(direction, direction);
+        
+        console.log(`找到最近敌人，距离: ${minDistance.toFixed(1)}`);
+        return direction;
+    }
+
+    // 递归搜索敌人节点
+    private findEnemies(node: Node, enemyList: Node[]): void {
+        if (!node) return;
+
+        // 检查当前节点是否是敌人
+        const nodeName = node.name.toLowerCase();
+        const hasEnemyScript = node.getComponent('testmove') || node.getComponent('Enemy');
+        
+        if (hasEnemyScript || nodeName.includes('enemy') || nodeName.includes('怪物')) {
+            enemyList.push(node);
+        }
+
+        // 递归检查子节点
+        for (let i = 0; i < node.children.length; i++) {
+            this.findEnemies(node.children[i], enemyList);
         }
     }
 
