@@ -113,7 +113,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Desert Trail",
+    "_name": "single-gunshot-62-hp-37188",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -154,7 +154,7 @@
       "y": 0,
       "z": 0
     },
-    "_id": "d7qop8iRxPyqxu/tHzGw/F"
+    "_id": "a8gimt/65Ce7KH0jGtV0vB"
   },
   {
     "__type__": "cc.AudioSource",
@@ -167,17 +167,17 @@
     "_enabled": true,
     "__prefab": null,
     "_clip": {
-      "__uuid__": "36902ab4-120d-4cc9-88f2-3f4548ba1739",
+      "__uuid__": "85ce0de7-d3c3-4001-a812-106b89fdd5c6",
       "__expectedType__": "cc.AudioClip"
     },
-    "_loop": true,
+    "_loop": false,
     "_playOnAwake": false,
-    "_volume": 1,
-    "_id": "54q8E+DdRHOpB0YkCtPyPY"
+    "_volume": 0.2,
+    "_id": "294prjVklOl5h8gcOLcPrq"
   },
   {
     "__type__": "cc.Node",
-    "_name": "single-gunshot-62-hp-37188",
+    "_name": "Desert Trail (3)",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -218,7 +218,7 @@
       "y": 0,
       "z": 0
     },
-    "_id": "a8gimt/65Ce7KH0jGtV0vB"
+    "_id": "50dRUQ0H1AHrNXhhYJWu8r"
   },
   {
     "__type__": "cc.AudioSource",
@@ -231,13 +231,13 @@
     "_enabled": true,
     "__prefab": null,
     "_clip": {
-      "__uuid__": "aca6c302-f1e2-4efe-96cc-47ca17a11c5e",
+      "__uuid__": "3ab8ae17-5bb7-49c1-80a5-d4e4e95cf6a8",
       "__expectedType__": "cc.AudioClip"
     },
-    "_loop": false,
+    "_loop": true,
     "_playOnAwake": false,
-    "_volume": 0.2,
-    "_id": "294prjVklOl5h8gcOLcPrq"
+    "_volume": 1,
+    "_id": "3ck1guulJDgoZkWcQz4Iy6"
   },
   {
     "__type__": "e9d9aQQ7DJFdJY2COv0fPCb",
@@ -250,10 +250,10 @@
     "_enabled": true,
     "__prefab": null,
     "bgmSource": {
-      "__id__": 4
+      "__id__": 6
     },
     "sfxSource": {
-      "__id__": 6
+      "__id__": 4
     },
     "_id": "2bJfbUt4dD/5gl2oFrNi2e"
   },
