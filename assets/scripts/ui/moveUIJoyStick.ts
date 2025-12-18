@@ -74,8 +74,8 @@ export class UIJoyStick extends Component {
         this.thumbnail.node.setPosition(thumbnailPosition);
 
         // 将计算的结果赋予给 Input
-        VirtualInput.horizontal = this.thumbnail.node.position.x / this.radius;
-        VirtualInput.vertical = this.thumbnail.node.position.y / this.radius;
+        VirtualInput.moveX = this.thumbnail.node.position.x / this.radius;
+        VirtualInput.moveY = this.thumbnail.node.position.y / this.radius;
     }
 
     /**
@@ -84,8 +84,8 @@ export class UIJoyStick extends Component {
      */
     onTouchEnd(touchEvent: EventTouch) {
         this.thumbnail.node.setPosition(v3());
-        VirtualInput.horizontal = 0;
-        VirtualInput.vertical = 0;
+        VirtualInput.moveX = 0;
+        VirtualInput.moveY = 0;
 
         // 摇杆的位置回归到初始化位置
         this.joyStickBg.node.worldPosition = this.initJoyStickBgPosition;
