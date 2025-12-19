@@ -117,22 +117,6 @@ export class Bullet extends Component {
             const moveY = this.direction.y * this.speed * deltaTime;
             const newPos = new Vec3(pos.x + moveX, pos.y + moveY, pos.z);
             this.node.setPosition(newPos);
-            
-            // 调试信息
-            if (this.currentTime < 0.5) { // 只在前0.5秒显示调试信息
-                console.log(`手动移动: 从(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) 到(${newPos.x.toFixed(1)}, ${newPos.y.toFixed(1)})`);
-            }
-        } else {
-            // 调试刚体速度
-            if (this.currentTime < 0.5) {
-                if (this.rigidBody2D) {
-                    const velocity = this.rigidBody2D.linearVelocity;
-                    console.log(`2D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
-                } else if (this.rigidBody) {
-                    const velocity = this.rigidBody.getLinearVelocity();
-                    console.log(`3D刚体速度: (${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)})`);
-                }
-            }
         }
 
         // 生命周期结束时销毁子弹
