@@ -19,8 +19,11 @@ export class GameUI extends Component {
     private ammoUpdateInterval: number = 0;
 
     protected onLoad(): void {
+        console.log('🔥 GameUI: onLoad() 被调用，组件开始初始化');
+        
         // 获取玩家射击组件
         if (!this.playerShooter) {
+            console.log('🔥 GameUI: playerShooter未设置，尝试自动查找...');
             const player = this.node.parent?.getChildByName('Player');
             if (player) {
                 this.playerShooter = player.getComponent(PlayerShooter);
@@ -28,6 +31,8 @@ export class GameUI extends Component {
             } else {
                 console.error('🔥 GameUI: 未找到Player节点');
             }
+        } else {
+            console.log('🔥 GameUI: playerShooter已在检查器中设置');
         }
 
         if (!this.joystickNode) return;
