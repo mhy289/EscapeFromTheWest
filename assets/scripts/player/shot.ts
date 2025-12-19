@@ -231,44 +231,7 @@ export class PlayerShooter extends Component {
         }
     }
 
-    private setupTouchControls(): void {
-        // 设置开火按钮
-        if (this.fireButton) {
-            this.fireButton.on(Input.EventType.TOUCH_START, this.onFireButtonPress, this);
-            this.fireButton.on(Input.EventType.TOUCH_END, this.onFireButtonRelease, this);
-            this.fireButton.on(Input.EventType.TOUCH_CANCEL, this.onFireButtonRelease, this);
-        }
-
-        // 设置换弹按钮
-        if (this.reloadButton) {
-            this.reloadButton.on(Input.EventType.TOUCH_START, this.onReloadButtonPress, this);
-        }
-
-        // 设置虚拟摇杆（如果需要自定义摇杆逻辑）
-        if (this.virtualJoystick) {
-            this.setupVirtualJoystick();
-        }
-    }
-
-    private onFireButtonPress(): void {
-        console.log('🔥 PlayerShooter.onFireButtonPress - 射击按钮按下 - 设置fireKeyPressed=true');
-        this.fireKeyPressed = true;
-    }
-
-    private onFireButtonRelease(): void {
-        console.log('🔥 PlayerShooter.onFireButtonRelease - 射击按钮释放 - 设置fireKeyPressed=false');
-        this.fireKeyPressed = false;
-    }
-
-    private onReloadButtonPress(): void {
-        this.tryReload();
-    }
-
-    private setupVirtualJoystick(): void {
-        // 这里可以添加自定义摇杆逻辑
-        // 或者使用第三方摇杆插件
-        console.log('Virtual joystick setup completed');
-    }
+    
 
     // 设置摇杆角度（由摇杆组件调用）- 现在主要用于左摇杆移动
     public setJoystickAngle(angle: number): void {
@@ -490,13 +453,7 @@ export class PlayerShooter extends Component {
     update(deltaTime: number): void {
         // 持续射击（如果按住开火键）
         if (this.fireKeyPressed) {
-            console.log('🔥 PlayerShooter.update() - fireKeyPressed=true，准备射击');
             this.tryFire();
-        } else {
-            // 每秒输出一次fireKeyPressed状态用于调试
-            if (Math.random() < 0.016) { // 约1/60的概率，每秒一次
-                console.log('🔥 PlayerShooter.update() - fireKeyPressed=false，不射击');
-            }
         }
     }
 

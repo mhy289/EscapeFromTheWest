@@ -59,11 +59,6 @@ export class RightJoyStick extends Component {
         // 更新 VirtualInput 右摇杆
         VirtualInput.aimX = this.thumbnail.node.position.x / this.radius;
         VirtualInput.aimY = this.thumbnail.node.position.y / this.radius;
-
-        // 调试信息
-        if (Math.abs(VirtualInput.aimX) > 0.1 || Math.abs(VirtualInput.aimY) > 0.1) {
-            console.log(`🎯 瞄准摇杆 - 方向:(${VirtualInput.aimX.toFixed(2)}, ${VirtualInput.aimY.toFixed(2)}) - 控制射击方向`);
-        }
     }
 
     onTouchEnd(eventTouch: EventTouch) {

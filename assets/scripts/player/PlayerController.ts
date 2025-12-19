@@ -25,16 +25,6 @@ export class PlayerController extends Component {
         const dir = new Vec3(VirtualInput.moveX, VirtualInput.moveY, 0);
         this.mover.setMovementDirection(dir);
 
-        // 调试：检查移动摇杆是否意外影响了射击状态
-        if (dir.length() > 0.1) {
-            console.log(`🎮 PlayerController - 移动摇杆方向: (${dir.x.toFixed(2)}, ${dir.y.toFixed(2)}) - 检查射击状态`);
-            
-            // 检查射击器状态
-            if (this.shooter && this.shooter['fireKeyPressed']) {
-                console.log('⚠️ 警告：移动摇杆操作期间fireKeyPressed=true - 可能存在问题！');
-            }
-        }
-
         // 移动摇杆不再触发射击角度更新，只有右摇杆（瞄准摇杆）才控制射击方向
     }
 }
