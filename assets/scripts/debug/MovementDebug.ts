@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, KeyCode, input, Input } from 'cc';
-import { move } from '../player/move';
+import { move } from '../player/move.ts';
 const { ccclass, property } = _decorator;
 
 /**

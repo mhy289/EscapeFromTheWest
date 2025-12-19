@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, Button } from 'cc';
-import { AudioManager } from '../common/AudioManager';
+import { AudioManager } from '../common/AudioManager.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('SimpleSetting')

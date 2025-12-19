@@ -1,5 +1,5 @@
 import { _decorator, Component, Slider } from 'cc';
-import { AudioManager } from '../common/AudioManager';
+import { AudioManager } from '../common/AudioManager.ts';
 
 const { ccclass } = _decorator;
 

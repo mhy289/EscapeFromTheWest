@@ -1,4 +1,4 @@
-import { _decorator, Component, input, Input, KeyCode, EventMouse, systemEvent, SystemEvent } from 'cc';
+import { _decorator, Component, input, Input, KeyCode, EventMouse } from 'cc';
 const { ccclass, property } = _decorator;
 
 /**
@@ -42,9 +42,9 @@ export class InputManager extends Component {
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         
         // 鼠标事件
-        systemEvent.on(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
-        systemEvent.on(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
-        systemEvent.on(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
+        input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+        input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+        input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
         
         console.log('InputManager: 输入事件监听设置完成');
     }
@@ -225,9 +225,9 @@ export class InputManager extends Component {
         // 清理事件监听
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
         input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
-        systemEvent.off(SystemEvent.EventType.MOUSE_DOWN, this.onMouseDown, this);
-        systemEvent.off(SystemEvent.EventType.MOUSE_UP, this.onMouseUp, this);
-        systemEvent.off(SystemEvent.EventType.MOUSE_MOVE, this.onMouseMove, this);
+        input.off(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
+        input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+        input.off(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
         
         // 清空监听器
         this.keyDownListeners = [];

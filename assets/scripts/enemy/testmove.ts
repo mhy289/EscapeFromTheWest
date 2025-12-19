@@ -1,4 +1,5 @@
 import { _decorator, Component, Node } from 'cc';
+import { Enemy } from './Enemy.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('testmove')
@@ -29,6 +30,26 @@ export class testmove extends Component {
     start() {
         // 可在 start 中根据需要随机化参数
         // this._phase = Math.random() * Math.PI * 2;
+        
+        // 确保敌人有Enemy组件用于处理伤害
+        if (!this.node.getComponent(Enemy)) {
+            this.node.addComponent(Enemy);
+            console.log('为testmove节点添加Enemy组件');
+        }
+    }
+
+    // 受到伤害（委托给Enemy组件）
+    public takeDamage(damage: number): void {
+        const enemyComponent = this.node.getComponent(Enemy);
+        if (enemyComponent) {
+            enemyComponent.takeDamage(damage);
+        } else {
+            console.log('敌人受到伤害但没有Enemy组件，直接销毁');
+            // 如果没有Enemy组件，受到伤害直接销毁（简单处理）
+            if (damage >= 50) { // 假设伤害大于50直接销毁
+                this.node.destroy();
+            }
+        }
     }
 
     update(deltaTime: number) {
