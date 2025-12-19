@@ -221,14 +221,14 @@ export class GameUI extends Component {
     }
 
     private onFireButtonPressed(): void {
+        console.log('GameUI: 射击按钮按下 - 开始射击');
         if (this.playerShooter) {
-            // 直接调用射击器的按键处理
-            // 或者通过公共方法触发射击
             this.playerShooter['fireKeyPressed'] = true;
         }
     }
 
     private onFireButtonReleased(): void {
+        console.log('GameUI: 射击按钮释放 - 停止射击');
         if (this.playerShooter) {
             this.playerShooter['fireKeyPressed'] = false;
         }
@@ -300,18 +300,7 @@ export class GameUI extends Component {
         console.log('GameUI: 玩家射击组件已设置，移动摇杆不再触发射击');
     }
 
-    protected onDestroy(): void {
-        // 清理事件监听
-        if (this.fireButton) {
-            this.fireButton.off(Input.EventType.TOUCH_START, this.onFireButtonPressed, this);
-            this.fireButton.off(Input.EventType.TOUCH_END, this.onFireButtonReleased, this);
-            this.fireButton.off(Input.EventType.TOUCH_CANCEL, this.onFireButtonReleased, this);
-        }
-
-        if (this.reloadButton) {
-            this.reloadButton.off(Input.EventType.TOUCH_START, this.onReloadButtonPressed, this);
-        }
-    }
+    // 这个onDestroy方法被移除，使用下面的版本
 }
     */
 
@@ -344,23 +333,9 @@ export class GameUI extends Component {
     }
 
     private setupUIEvents(): void {
-        if (this.fireButton) {
-            this.fireButton.on(Input.EventType.TOUCH_START, () => {
-                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = true;
-            });
-            this.fireButton.on(Input.EventType.TOUCH_END, () => {
-                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = false;
-            });
-            this.fireButton.on(Input.EventType.TOUCH_CANCEL, () => {
-                if (this.playerShooter) this.playerShooter['fireKeyPressed'] = false;
-            });
-        }
-
-        if (this.reloadButton) {
-            this.reloadButton.on(Input.EventType.TOUCH_START, () => {
-                if (this.playerShooter) this.playerShooter['tryReload']();
-            });
-        }
+        // 移除重复的事件监听器设置 - 保留原始的onFireButtonPressed方法调用
+        // 事件监听器已在setupTouchControls中设置
+        console.log('GameUI: setupUIEvents - 事件已在其他地方设置');
     }
 
     private setupUIMode(): void {
@@ -387,16 +362,9 @@ export class GameUI extends Component {
             this.ammoUpdateInterval = 0;
         }
 
-        // 移除移动摇杆的射击方向更新 - 移动摇杆只控制移动，不控制射击
-        // 射击方向现在由PlayerAim组件根据右摇杆输入控制
-        // 调试：监控移动摇杆输入
-        if (this.playerShooter) {
-            const x = VirtualInput.horizontal;
-            const y = VirtualInput.vertical;
-            if (x !== 0 || y !== 0) {
-                // console.log(`移动摇杆输入: (${x.toFixed(2)}, ${y.toFixed(2)}) - 不触发射击`);
-            }
-        }
+        // 移动摇杆不再控制射击方向，移动摇杆只影响移动
+        // 射击方向由PlayerAim组件根据右摇杆输入控制
+        // 这里不需要任何移动摇杆相关的射击逻辑
     }
 
     private updateAmmoDisplay(): void {
@@ -411,9 +379,17 @@ export class GameUI extends Component {
     }
 
     protected onDestroy(): void {
-        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_START);
-        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_END);
-        if (this.fireButton) this.fireButton.off(Input.EventType.TOUCH_CANCEL);
-        if (this.reloadButton) this.reloadButton.off(Input.EventType.TOUCH_START);
+        // 清理所有事件监听器
+        if (this.fireButton) {
+            this.fireButton.off(Input.EventType.TOUCH_START, this.onFireButtonPressed, this);
+            this.fireButton.off(Input.EventType.TOUCH_END, this.onFireButtonReleased, this);
+            this.fireButton.off(Input.EventType.TOUCH_CANCEL, this.onFireButtonReleased, this);
+        }
+        
+        if (this.reloadButton) {
+            this.reloadButton.off(Input.EventType.TOUCH_START, this.onReloadButtonPressed, this);
+        }
+        
+        console.log('GameUI: 事件监听器已清理');
     }
 }
