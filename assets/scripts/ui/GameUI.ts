@@ -221,14 +221,14 @@ export class GameUI extends Component {
     }
 
     private onFireButtonPressed(): void {
-        console.log('GameUI: 射击按钮按下 - 开始射击');
+        console.log('🔥 GameUI: 射击按钮按下 - 设置fireKeyPressed=true');
         if (this.playerShooter) {
             this.playerShooter['fireKeyPressed'] = true;
         }
     }
 
     private onFireButtonReleased(): void {
-        console.log('GameUI: 射击按钮释放 - 停止射击');
+        console.log('🔥 GameUI: 射击按钮释放 - 设置fireKeyPressed=false');
         if (this.playerShooter) {
             this.playerShooter['fireKeyPressed'] = false;
         }
@@ -333,9 +333,19 @@ export class GameUI extends Component {
     }
 
     private setupUIEvents(): void {
-        // 移除重复的事件监听器设置 - 保留原始的onFireButtonPressed方法调用
-        // 事件监听器已在setupTouchControls中设置
-        console.log('GameUI: setupUIEvents - 事件已在其他地方设置');
+        // 设置开火按钮
+        if (this.fireButton) {
+            console.log('🔥 GameUI: 设置开火按钮事件监听器');
+            this.fireButton.on(Input.EventType.TOUCH_START, this.onFireButtonPressed, this);
+            this.fireButton.on(Input.EventType.TOUCH_END, this.onFireButtonReleased, this);
+            this.fireButton.on(Input.EventType.TOUCH_CANCEL, this.onFireButtonReleased, this);
+        }
+
+        // 设置换弹按钮
+        if (this.reloadButton) {
+            console.log('🔥 GameUI: 设置换弹按钮事件监听器');
+            this.reloadButton.on(Input.EventType.TOUCH_START, this.onReloadButtonPressed, this);
+        }
     }
 
     private setupUIMode(): void {

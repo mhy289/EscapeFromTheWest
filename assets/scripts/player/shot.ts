@@ -153,8 +153,8 @@ export class PlayerShooter extends Component {
     }
 
     private setupVirtualJoystickControls(): void {
-        // 设置触摸控制
-        this.setupTouchControls();
+        // 虚拟摇杆模式下的触摸控制已移至GameUI.ts中统一管理
+        console.log('🔥 PlayerShooter: 虚拟摇杆控制已移至GameUI.ts管理');
     }
 
     private onKeyDown(keyCode: number): void {
@@ -251,12 +251,12 @@ export class PlayerShooter extends Component {
     }
 
     private onFireButtonPress(): void {
-        console.log('射击按钮按下 - 开始射击');
+        console.log('🔥 PlayerShooter.onFireButtonPress - 射击按钮按下 - 设置fireKeyPressed=true');
         this.fireKeyPressed = true;
     }
 
     private onFireButtonRelease(): void {
-        console.log('射击按钮释放 - 停止射击');
+        console.log('🔥 PlayerShooter.onFireButtonRelease - 射击按钮释放 - 设置fireKeyPressed=false');
         this.fireKeyPressed = false;
     }
 
@@ -490,7 +490,13 @@ export class PlayerShooter extends Component {
     update(deltaTime: number): void {
         // 持续射击（如果按住开火键）
         if (this.fireKeyPressed) {
+            console.log('🔥 PlayerShooter.update() - fireKeyPressed=true，准备射击');
             this.tryFire();
+        } else {
+            // 每秒输出一次fireKeyPressed状态用于调试
+            if (Math.random() < 0.016) { // 约1/60的概率，每秒一次
+                console.log('🔥 PlayerShooter.update() - fireKeyPressed=false，不射击');
+            }
         }
     }
 

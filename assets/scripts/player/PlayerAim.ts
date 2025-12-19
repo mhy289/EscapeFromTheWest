@@ -39,7 +39,12 @@ export class PlayerAim extends Component {
             this._aimDirection.set(x, y, 0);
             this._aimDirection.normalize();
             hasInput = true;
-            console.log(`右摇杆输入: (${x.toFixed(2)}, ${y.toFixed(2)})`);
+            console.log(`🎯 PlayerAim - 右摇杆输入: (${x.toFixed(2)}, ${y.toFixed(2)})`);
+        } else {
+            // 定期输出无输入状态用于调试
+            if (Math.random() < 0.016) { // 约1/60的概率，每秒一次
+                console.log(`🎯 PlayerAim - 无右摇杆输入: (0.00, 0.00)`);
+            }
         }
 
         // 如果你是 2D 角色，可以在这里直接转向
@@ -48,6 +53,7 @@ export class PlayerAim extends Component {
         // 只有在有输入时才更新射击器的瞄准方向
         if (this.shooter && hasInput) {
             this.shooter.setAimJoystickDirection(this._aimDirection);
+            console.log(`🎯 PlayerAim - 设置瞄准方向: (${this._aimDirection.x.toFixed(2)}, ${this._aimDirection.y.toFixed(2)})`);
         }
     }
 

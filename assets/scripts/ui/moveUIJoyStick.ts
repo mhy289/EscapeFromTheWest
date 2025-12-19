@@ -76,6 +76,11 @@ export class UIJoyStick extends Component {
         // 将计算的结果赋予给 Input
         VirtualInput.moveX = this.thumbnail.node.position.x / this.radius;
         VirtualInput.moveY = this.thumbnail.node.position.y / this.radius;
+
+        // 调试信息
+        if (Math.abs(VirtualInput.moveX) > 0.1 || Math.abs(VirtualInput.moveY) > 0.1) {
+            console.log(`🎮 移动摇杆 - 方向:(${VirtualInput.moveX.toFixed(2)}, ${VirtualInput.moveY.toFixed(2)}) - 只移动，不射击`);
+        }
     }
 
     /**
@@ -86,6 +91,8 @@ export class UIJoyStick extends Component {
         this.thumbnail.node.setPosition(v3());
         VirtualInput.moveX = 0;
         VirtualInput.moveY = 0;
+
+        console.log('🎮 移动摇杆结束 - 重置方向(0, 0) - 确保不触发射击');
 
         // 摇杆的位置回归到初始化位置
         this.joyStickBg.node.worldPosition = this.initJoyStickBgPosition;
