@@ -188,7 +188,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 502.07452165156093,
+    "_orthoHeight": 360,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -2455,7 +2455,7 @@
     "reloadButton": null,
     "virtualJoystick": null,
     "useVirtualJoystick": false,
-    "autoAimMode": true,
+    "autoAimMode": false,
     "aimRange": 1000,
     "_id": "a0JyOolnBJIJf2dFQuPyvN"
   },
@@ -2503,7 +2503,7 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 413.578,
+      "x": -504.768,
       "y": -90.664,
       "z": 1000
     },
@@ -3053,7 +3053,7 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 184.476,
+      "x": 502.738,
       "y": -83.558,
       "z": 1000
     },

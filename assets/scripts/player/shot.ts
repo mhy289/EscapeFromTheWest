@@ -74,6 +74,7 @@ export class PlayerShooter extends Component {
     private lastFireTime: number = 0;
     private joystickAngle: number = 0; // 摇杆角度（弧度）
     private mouseDirection: Vec3 = new Vec3(1, 0, 0); // 鼠标方向
+    private aimJoystickDirection: Vec3 = new Vec3(1, 0, 0); // 右摇杆（瞄准摇杆）方向
 
     // 按键状态
     private fireKeyPressed: boolean = false;
@@ -267,9 +268,15 @@ export class PlayerShooter extends Component {
         console.log('Virtual joystick setup completed');
     }
 
-    // 设置摇杆角度（由摇杆组件调用）
+    // 设置摇杆角度（由摇杆组件调用）- 现在主要用于左摇杆移动
     public setJoystickAngle(angle: number): void {
         this.joystickAngle = angle;
+    }
+
+    // 设置瞄准摇杆方向（由PlayerAim调用）
+    public setAimJoystickDirection(direction: Vec3): void {
+        this.aimJoystickDirection = direction.clone();
+        this.aimJoystickDirection.normalize();
     }
 
     private tryFire(): void {
@@ -352,23 +359,34 @@ export class PlayerShooter extends Component {
     }
 
     private getFireDirection(): Vec3 {
-        // 如果启用了敌人追踪模式，优先射向最近的敌人
+        // 检查是否有右摇杆（瞄准摇杆）输入
+        const hasAimJoystickInput = this.aimJoystickDirection.length() > 0.01;
+        
+        // 如果是右摇杆射击，优先使用右摇杆方向
+        if (hasAimJoystickInput) {
+            console.log(`使用右摇杆方向: (${this.aimJoystickDirection.x.toFixed(2)}, ${this.aimJoystickDirection.y.toFixed(2)})`);
+            return this.aimJoystickDirection.clone();
+        }
+
+        // 如果启用敌人追踪模式且不是右摇杆射击，则自动瞄准
         if (this.autoAimMode) {
             const enemyDirection = this.getNearestEnemyDirection();
             if (enemyDirection) {
-                console.log(`瞄准敌人: 方向(${enemyDirection.x.toFixed(2)}, ${enemyDirection.y.toFixed(2)})`);
+                console.log(`自动瞄准敌人: 方向(${enemyDirection.x.toFixed(2)}, ${enemyDirection.y.toFixed(2)})`);
                 return enemyDirection;
             }
         }
 
-        // 否则使用正常射击方向
+        // 否则使用默认射击方向
         if (this.useVirtualJoystick) {
-            // 虚拟摇杆模式：使用摇杆方向
+            // 虚拟摇杆模式：使用摇杆方向（备用，通常不使用）
             const x = Math.cos(this.joystickAngle);
             const y = Math.sin(this.joystickAngle);
+            console.log(`使用左摇杆方向: (${x.toFixed(2)}, ${y.toFixed(2)})`);
             return new Vec3(x, y, 0);
         } else {
             // 键盘鼠标模式：使用鼠标方向
+            console.log(`使用鼠标方向: (${this.mouseDirection.x.toFixed(2)}, ${this.mouseDirection.y.toFixed(2)})`);
             return Vec3.clone(this.mouseDirection);
         }
     }

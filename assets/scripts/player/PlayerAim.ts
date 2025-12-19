@@ -1,5 +1,6 @@
 import { _decorator, Component, Vec3, math } from 'cc';
 import { VirtualInput } from '../input/VirtualInput';
+import { PlayerShooter } from './shot';
 const { ccclass, property } = _decorator;
 
 /**
@@ -8,6 +9,9 @@ const { ccclass, property } = _decorator;
  */
 @ccclass('PlayerAim')
 export class PlayerAim extends Component {
+
+    @property({ type: PlayerShooter })
+    shooter: PlayerShooter = null;
 
     /**
      * 当前视野方向（单位向量）
@@ -27,6 +31,11 @@ export class PlayerAim extends Component {
 
         // 如果你是 2D 角色，可以在这里直接转向
         this.applyRotation();
+
+        // 更新射击器的瞄准方向
+        if (this.shooter) {
+            this.shooter.setAimJoystickDirection(this._aimDirection);
+        }
     }
 
     /**

@@ -25,10 +25,6 @@ export class PlayerController extends Component {
         const dir = new Vec3(VirtualInput.moveX, VirtualInput.moveY, 0);
         this.mover.setMovementDirection(dir);
 
-        // 更新射击角度
-        if (this.shooter && dir.length() > 0) {
-            const angle = Math.atan2(dir.y, dir.x);
-            this.shooter.setJoystickAngle(angle);
-        }
+        // 移动摇杆不再触发射击角度更新，只有右摇杆（瞄准摇杆）才控制射击方向
     }
 }
