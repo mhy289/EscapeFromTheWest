@@ -1,5 +1,4 @@
-import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, find } from 'cc';
-import { InputManager } from './InputManager.ts';
+import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, Camera, v3, EventMouse, find, input, Input, Button } from 'cc';
 import { Bullet } from './Bullet.ts';
 const { ccclass, property } = _decorator;
 
@@ -101,33 +100,32 @@ export class PlayerShooter extends Component {
     protected onLoad(): void {
         // 初始化弹药
         this.currentAmmo = this.maxAmmo;
-
-        // 延迟设置控制模式，确保InputManager已经初始化
-        this.scheduleOnce(() => {
-            this.setupControlMode();
-        }, 0.1);
-    }
-
-    protected start(): void {
         console.log(`PlayerShooter initialized - Mode: ${this.useVirtualJoystick ? 'Virtual Joystick' : 'Keyboard + Mouse'}`);
         console.log(`Ammo: ${this.currentAmmo}/${this.maxAmmo}`);
+        
+        // 直接设置控制模式，不使用延迟
+        this.setupControlMode();
     }
 
     private setupControlMode(): void {
-        if (this.useVirtualJoystick) {
-            // 虚拟摇杆模式
-            this.setupVirtualJoystickControls();
-        } else {
-            // 键盘鼠标模式
-            this.setupKeyboardMouseControls();
+        try {
+            if (this.useVirtualJoystick) {
+                // 虚拟摇杆模式
+                this.setupVirtualJoystickControls();
+            } else {
+                // 键盘鼠标模式
+                this.setupKeyboardMouseControls();
+            }
+        } catch (error) {
+            console.error('设置控制模式时出错:', error);
         }
     }
 
     private setupKeyboardMouseControls(): void {
-        console.log('Shot: 设置键盘鼠标控制（使用InputManager）');
+        console.log('Shot: 设置键盘鼠标控制（直接模式）');
         
-        // 检查InputManager是否存在，如果不存在则等待
-        if (InputManager.instance) {
+        // 直接绑定事件，不使用InputManager
+        try {
             // 创建绑定的函数引用并保存
             this.boundOnKeyDown = this.onKeyDown.bind(this);
             this.boundOnKeyUp = this.onKeyUp.bind(this);
@@ -135,65 +133,38 @@ export class PlayerShooter extends Component {
             this.boundOnMouseUp = this.onMouseUp.bind(this);
             this.boundOnMouseMove = this.onMouseMove.bind(this);
             
-            InputManager.instance.addKeyDownListener(this.boundOnKeyDown);
-            InputManager.instance.addKeyUpListener(this.boundOnKeyUp);
-            InputManager.instance.addMouseDownListener(this.boundOnMouseDown);
-            InputManager.instance.addMouseUpListener(this.boundOnMouseUp);
-            InputManager.instance.addMouseMoveListener(this.boundOnMouseMove);
-            console.log('Shot: 键盘鼠标控制设置成功');
-        } else {
-            console.error('Shot: InputManager实例不存在，尝试延迟重试...');
-            // 延迟重试
-            this.scheduleOnce(() => {
-                this.setupKeyboardMouseControls();
-            }, 0.2);
+            // 直接绑定到input系统
+            input.on(Input.EventType.KEY_DOWN, this.boundOnKeyDown, this);
+            input.on(Input.EventType.KEY_UP, this.boundOnKeyUp, this);
+            input.on(Input.EventType.MOUSE_DOWN, this.boundOnMouseDown, this);
+            input.on(Input.EventType.MOUSE_UP, this.boundOnMouseUp, this);
+            input.on(Input.EventType.MOUSE_MOVE, this.boundOnMouseMove, this);
+            
+            console.log('✅ 键盘鼠标控制设置成功（直接绑定）');
+        } catch (error) {
+            console.error('❌ 键盘鼠标控制设置失败:', error);
         }
-        
-        console.log('键盘鼠标模式已启用');
     }
 
     private setupVirtualJoystickControls(): void {
-        console.log('Shot: 设置虚拟摇杆控制');
+        console.log('🎮 虚拟摇杆控制初始化');
         
-        // 查找开火按钮节点
-        const canvas = find('Canvas');
-        if (canvas) {
-            console.log('Canvas下的子节点:');
-            for (let i = 0; i < canvas.children.length; i++) {
-                const child = canvas.children[i];
-                console.log(`  - ${child.name} (active: ${child.active})`);
-            }
-            
-            // 查找shoot节点
-            const shootNode = canvas.getChildByName('shoot');
-            if (shootNode) {
-                console.log('✅ 找到shoot节点:', shootNode.name);
-                
-                // 检查是否有Button组件
-                const button = shootNode.getComponent(Button);
-                if (button) {
-                    console.log('✅ shoot节点有Button组件');
-                    console.log('📝 请在Cocos Creator中配置shoot按钮的Click Events：');
-                    console.log('   - Target: 拖拽Player节点');
-                    console.log('   - Component: 选择PlayerShooter');
-                    console.log('   - Function: 选择onFireButtonClick');
-                } else {
-                    console.warn('⚠️ shoot节点没有Button组件');
-                }
-            } else {
-                console.warn('⚠️ 未找到shoot节点');
-            }
-        } else {
-            console.error('❌ 未找到Canvas节点！');
-        }
-        
-        // 提供键盘备用方案
-        console.log('📱 虚拟摇杆模式控制说明：');
+        // 简化：只设置键盘备用控制，不查找UI节点
+        console.log('✅ 虚拟摇杆模式已启用');
+        console.log('📱 控制说明：');
         console.log('  - 移动：屏幕左侧摇杆');
-        console.log('  - 瞄准：屏幕右侧摇杆');
-        console.log('  - 开火：点击shoot按钮或按空格键');
+        console.log('  - 瞄准：屏幕右侧摇杆');  
+        console.log('  - 开火：点击shoot按钮或空格键');
         
-        console.log('虚拟摇杆控制设置完成');
+        // 绑定键盘事件作为备用
+        this.setupKeyboardBackup();
+    }
+    
+    private setupKeyboardBackup(): void {
+        // 设置键盘事件作为虚拟摇杆模式的备用方案
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+        console.log('⌨️ 键盘备用方案已设置');
     }
     
     // Click Event回调方法 - 由Button组件调用
@@ -471,9 +442,9 @@ export class PlayerShooter extends Component {
         return direction;
     }
 
-    // 递归搜索敌人节点
-    private findEnemies(node: Node, enemyList: Node[]): void {
-        if (!node) return;
+    // 递归搜索敌人节点（添加深度限制防止无限递归）
+    private findEnemies(node: Node, enemyList: Node[], depth: number = 0): void {
+        if (!node || depth > 10) return; // 限制递归深度
 
         // 检查当前节点是否是敌人
         const nodeName = node.name.toLowerCase();
@@ -485,7 +456,7 @@ export class PlayerShooter extends Component {
 
         // 递归检查子节点
         for (let i = 0; i < node.children.length; i++) {
-            this.findEnemies(node.children[i], enemyList);
+            this.findEnemies(node.children[i], enemyList, depth + 1);
         }
     }
 
@@ -543,37 +514,38 @@ export class PlayerShooter extends Component {
     }
 
     protected onDestroy(): void {
-        // 清理事件监听
-        if (this.useVirtualJoystick) {
-            // 使用Click Event时无需手动清理，由Button组件自动管理
-            console.log('🔥 使用Click Event模式，无需手动清理事件监听器');
-        } else {
-            // 键盘鼠标模式清理
-            if (InputManager.instance) {
-                if (this.boundOnKeyDown) {
-                    InputManager.instance.removeKeyDownListener(this.boundOnKeyDown);
-                    this.boundOnKeyDown = null;
-                }
-                if (this.boundOnKeyUp) {
-                    InputManager.instance.removeKeyUpListener(this.boundOnKeyUp);
-                    this.boundOnKeyUp = null;
-                }
-                if (this.boundOnMouseDown) {
-                    InputManager.instance.removeMouseDownListener(this.boundOnMouseDown);
-                    this.boundOnMouseDown = null;
-                }
-                if (this.boundOnMouseUp) {
-                    InputManager.instance.removeMouseUpListener(this.boundOnMouseUp);
-                    this.boundOnMouseUp = null;
-                }
-                if (this.boundOnMouseMove) {
-                    InputManager.instance.removeMouseMoveListener(this.boundOnMouseMove);
-                    this.boundOnMouseMove = null;
-                }
+        console.log('🔥 PlayerShooter onDestroy - 开始清理');
+        
+        try {
+            // 清理键盘鼠标模式的事件监听
+            if (this.boundOnKeyDown) {
+                input.off(Input.EventType.KEY_DOWN, this.boundOnKeyDown, this);
             }
+            if (this.boundOnKeyUp) {
+                input.off(Input.EventType.KEY_UP, this.boundOnKeyUp, this);
+            }
+            if (this.boundOnMouseDown) {
+                input.off(Input.EventType.MOUSE_DOWN, this.boundOnMouseDown, this);
+            }
+            if (this.boundOnMouseUp) {
+                input.off(Input.EventType.MOUSE_UP, this.boundOnMouseUp, this);
+            }
+            if (this.boundOnMouseMove) {
+                input.off(Input.EventType.MOUSE_MOVE, this.boundOnMouseMove, this);
+            }
+            
+            // 清理虚拟摇杆模式的键盘备用事件
+            input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+            input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
+            
+            console.log('✅ 事件监听器清理完成');
+        } catch (error) {
+            console.error('❌ 清理事件监听器时出错:', error);
         }
 
+        // 清理所有定时器
         this.unscheduleAllCallbacks();
+        console.log('✅ 定时器清理完成');
     }
 
     // 公共方法：获取弹药信息
