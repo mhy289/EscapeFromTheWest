@@ -251,10 +251,12 @@ export class PlayerShooter extends Component {
     }
 
     private onFireButtonPress(): void {
+        console.log('射击按钮按下 - 开始射击');
         this.fireKeyPressed = true;
     }
 
     private onFireButtonRelease(): void {
+        console.log('射击按钮释放 - 停止射击');
         this.fireKeyPressed = false;
     }
 
@@ -359,16 +361,7 @@ export class PlayerShooter extends Component {
     }
 
     private getFireDirection(): Vec3 {
-        // 检查是否有右摇杆（瞄准摇杆）输入
-        const hasAimJoystickInput = this.aimJoystickDirection.length() > 0.01;
-        
-        // 如果是右摇杆射击，优先使用右摇杆方向
-        if (hasAimJoystickInput) {
-            console.log(`使用右摇杆方向: (${this.aimJoystickDirection.x.toFixed(2)}, ${this.aimJoystickDirection.y.toFixed(2)})`);
-            return this.aimJoystickDirection.clone();
-        }
-
-        // 如果启用敌人追踪模式且不是右摇杆射击，则自动瞄准
+        // 如果启用敌人追踪模式，优先自动瞄准
         if (this.autoAimMode) {
             const enemyDirection = this.getNearestEnemyDirection();
             if (enemyDirection) {
@@ -377,12 +370,20 @@ export class PlayerShooter extends Component {
             }
         }
 
+        // 否则检查是否有右摇杆（瞄准摇杆）输入
+        const hasAimJoystickInput = this.aimJoystickDirection.length() > 0.01;
+        
+        if (hasAimJoystickInput) {
+            console.log(`使用右摇杆方向: (${this.aimJoystickDirection.x.toFixed(2)}, ${this.aimJoystickDirection.y.toFixed(2)})`);
+            return this.aimJoystickDirection.clone();
+        }
+
         // 否则使用默认射击方向
         if (this.useVirtualJoystick) {
             // 虚拟摇杆模式：使用摇杆方向（备用，通常不使用）
             const x = Math.cos(this.joystickAngle);
             const y = Math.sin(this.joystickAngle);
-            console.log(`使用左摇杆方向: (${x.toFixed(2)}, ${y.toFixed(2)})`);
+            console.log(`使用备用摇杆方向: (${x.toFixed(2)}, ${y.toFixed(2)})`);
             return new Vec3(x, y, 0);
         } else {
             // 键盘鼠标模式：使用鼠标方向

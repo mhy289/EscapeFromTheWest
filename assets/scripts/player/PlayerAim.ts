@@ -22,18 +22,21 @@ export class PlayerAim extends Component {
     update(deltaTime: number) {
         const x = VirtualInput.aimX;
         const y = VirtualInput.aimY;
+        let hasInput = false;
 
         // 右摇杆有输入时，更新方向
         if (Math.abs(x) > 0.01 || Math.abs(y) > 0.01) {
             this._aimDirection.set(x, y, 0);
             this._aimDirection.normalize();
+            hasInput = true;
+            console.log(`右摇杆输入: (${x.toFixed(2)}, ${y.toFixed(2)})`);
         }
 
         // 如果你是 2D 角色，可以在这里直接转向
         this.applyRotation();
 
-        // 更新射击器的瞄准方向
-        if (this.shooter) {
+        // 只有在有输入时才更新射击器的瞄准方向
+        if (this.shooter && hasInput) {
             this.shooter.setAimJoystickDirection(this._aimDirection);
         }
     }

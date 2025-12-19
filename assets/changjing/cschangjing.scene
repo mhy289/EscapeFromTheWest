@@ -2455,7 +2455,7 @@
     "reloadButton": null,
     "virtualJoystick": null,
     "useVirtualJoystick": false,
-    "autoAimMode": false,
+    "autoAimMode": true,
     "aimRange": 1000,
     "_id": "a0JyOolnBJIJf2dFQuPyvN"
   },
@@ -2836,6 +2836,7 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "shooter": null,
     "_id": "21f35WWaZMeo7fqFy4wLp7"
   },
   {
@@ -3053,7 +3054,7 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 502.738,
+      "x": 527.935,
       "y": -83.558,
       "z": 1000
     },

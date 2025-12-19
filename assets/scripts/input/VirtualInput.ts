@@ -29,8 +29,8 @@ export class VirtualInput {
 
     /* ================= 视野 / 朝向（右摇杆 / 鼠标） ================= */
 
-    // 默认朝向右，避免出现 0 向量
-    private static _aimX: number = 1;
+    // 默认值为0，表示没有输入
+    private static _aimX: number = 0;
     static get aimX(): number {
         return this._aimX;
     }
