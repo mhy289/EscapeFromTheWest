@@ -19,6 +19,17 @@ export class GameUI extends Component {
     private ammoUpdateInterval: number = 0;
 
     protected onLoad(): void {
+        // 获取玩家射击组件
+        if (!this.playerShooter) {
+            const player = this.node.parent?.getChildByName('Player');
+            if (player) {
+                this.playerShooter = player.getComponent(PlayerShooter);
+                console.log('🔥 GameUI: 找到PlayerShooter组件:', this.playerShooter ? '成功' : '失败');
+            } else {
+                console.error('🔥 GameUI: 未找到Player节点');
+            }
+        }
+
         if (!this.joystickNode) return;
         this.joystick = this.joystickNode.getComponent(UIJoyStick);
 
@@ -86,6 +97,9 @@ export class GameUI extends Component {
         console.log('🔥 GameUI: 射击按钮按下 - 设置fireKeyPressed=true');
         if (this.playerShooter) {
             this.playerShooter['fireKeyPressed'] = true;
+            console.log('🔥 GameUI: 成功设置fireKeyPressed=true');
+        } else {
+            console.error('🔥 GameUI: playerShooter为null，无法设置fireKeyPressed');
         }
     }
 
@@ -93,6 +107,9 @@ export class GameUI extends Component {
         console.log('🔥 GameUI: 射击按钮释放 - 设置fireKeyPressed=false');
         if (this.playerShooter) {
             this.playerShooter['fireKeyPressed'] = false;
+            console.log('🔥 GameUI: 成功设置fireKeyPressed=false');
+        } else {
+            console.error('🔥 GameUI: playerShooter为null，无法设置fireKeyPressed');
         }
     }
 

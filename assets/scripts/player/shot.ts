@@ -460,16 +460,8 @@ export class PlayerShooter extends Component {
     protected onDestroy(): void {
         // 清理事件监听
         if (this.useVirtualJoystick) {
-            // 虚拟摇杆模式清理
-            if (this.fireButton) {
-                this.fireButton.off(Input.EventType.TOUCH_START, this.onFireButtonPress, this);
-                this.fireButton.off(Input.EventType.TOUCH_END, this.onFireButtonRelease, this);
-                this.fireButton.off(Input.EventType.TOUCH_CANCEL, this.onFireButtonRelease, this);
-            }
-
-            if (this.reloadButton) {
-                this.reloadButton.off(Input.EventType.TOUCH_START, this.onReloadButtonPress, this);
-            }
+            // 虚拟摇杆模式：事件监听器由GameUI.ts管理，这里无需清理
+            console.log('🔥 PlayerShooter.onDestroy - 虚拟摇杆模式，事件由GameUI.ts管理');
         } else {
             // 键盘鼠标模式清理
             if (InputManager.instance) {
