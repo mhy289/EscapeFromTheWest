@@ -1,5 +1,5 @@
 import { _decorator, Component, director } from 'cc';
-import { AudioManager } from './AudioManager';
+import { AudioManager } from './AudioManager.ts';
 const { ccclass } = _decorator;
 
 @ccclass('Boot')

@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, director } from 'cc';
-import { InputManager } from '../player/InputManager';
+import { InputManager } from '../player/InputManager.ts';
 const { ccclass, property } = _decorator;
 
 /**

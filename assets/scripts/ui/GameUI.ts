@@ -1,8 +1,8 @@
 /*
 import { _decorator, Component, Node, Label, Button, input, Input } from 'cc';
-import { PlayerShooter } from '../player/shot';
-import { VirtualJoystick } from './VirtualJoystick';
-import { DualJoystick } from './DualJoystick';
+import { PlayerShooter } from '../player/shot.ts';
+import { VirtualJoystick } from './VirtualJoystick.ts';
+import { DualJoystick } from './DualJoystick.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameUI')
@@ -305,9 +305,9 @@ export class GameUI extends Component {
     */
 
 import { _decorator, Component, Node, Label, input, Input, Vec3 } from 'cc';
-import { PlayerShooter } from '../player/shot';
-import { UIJoyStick } from './UIJoyStick';
-import { VirtualInput } from '../input/VirtualInput';
+import { PlayerShooter } from '../player/shot.ts';
+import { UIJoyStick } from './moveUIJoyStick.ts';
+import { VirtualInput } from '../input/VirtualInput.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameUI')

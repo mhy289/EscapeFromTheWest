@@ -1,8 +1,8 @@
 import { _decorator, Component, Node, Prefab, instantiate, Vec3, KeyCode, find } from 'cc';
-import { Bullet } from '../player/Bullet';
-import { Enemy } from '../enemy/Enemy';
-import { testmove } from '../enemy/testmove';
-import { PlayerShooter } from '../player/shot';
+import { Bullet } from '../player/Bullet.ts';
+import { Enemy } from '../enemy/Enemy.ts';
+import { testmove } from '../enemy/testmove.ts';
+import { PlayerShooter } from '../player/shot.ts';
 const { ccclass, property } = _decorator;
 
 /**

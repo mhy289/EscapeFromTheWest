@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, KeyCode, Vec3, Prefab, instantiate, math, Camera, v3, EventMouse, find } from 'cc';
-import { InputManager } from './InputManager';
-import { Bullet } from './Bullet';
+import { InputManager } from './InputManager.ts';
+import { Bullet } from './Bullet.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerShooter')

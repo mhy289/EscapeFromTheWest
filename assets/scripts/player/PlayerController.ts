@@ -1,9 +1,9 @@
 
 import { _decorator, Component, Vec3 } from 'cc';
-import { PlayerShooter } from './shot';
-import { UIJoyStick } from '../ui/moveUIJoyStick';
-import { move } from './move';
-import { VirtualInput } from '../input/VirtualInput';
+import { PlayerShooter } from './shot.ts';
+import { UIJoyStick } from '../ui/moveUIJoyStick.ts';
+import { move } from './move.ts';
+import { VirtualInput } from '../input/VirtualInput.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerController')

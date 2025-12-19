@@ -1,6 +1,6 @@
 import { _decorator, Component, Vec3, math } from 'cc';
-import { VirtualInput } from '../input/VirtualInput';
-import { PlayerShooter } from './shot';
+import { VirtualInput } from '../input/VirtualInput.ts';
+import { PlayerShooter } from './shot.ts';
 const { ccclass, property } = _decorator;
 
 /**

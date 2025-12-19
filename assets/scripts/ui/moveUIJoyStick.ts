@@ -1,5 +1,5 @@
 import { _decorator, Component, CCFloat, EventTouch, Input, math, Sprite, v3, Vec3 } from 'cc';
-import { VirtualInput } from '../input/VirtualInput';
+import { VirtualInput } from '../input/VirtualInput.ts';
 const { ccclass, property } = _decorator;
 
 /**

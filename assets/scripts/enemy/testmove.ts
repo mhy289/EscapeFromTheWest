@@ -1,5 +1,5 @@
 import { _decorator, Component, Node } from 'cc';
-import { Enemy } from './Enemy';
+import { Enemy } from './Enemy.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('testmove')

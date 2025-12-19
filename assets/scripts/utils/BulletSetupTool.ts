@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, Prefab, instantiate, Vec3, Collider2D, RigidBody2D } from 'cc';
-import { Bullet } from '../player/Bullet';
+import { Bullet } from '../player/Bullet.ts';
 const { ccclass, property } = _decorator;
 
 /**

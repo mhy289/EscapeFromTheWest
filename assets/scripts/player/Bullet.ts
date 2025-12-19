@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, Vec3, Vec2, Collider, RigidBody, Collider2D, RigidBody2D, find } from 'cc';
-import { Enemy } from '../enemy/Enemy';
-import { testmove } from '../enemy/testmove';
+import { Enemy } from '../enemy/Enemy.ts';
+import { testmove } from '../enemy/testmove.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('Bullet')

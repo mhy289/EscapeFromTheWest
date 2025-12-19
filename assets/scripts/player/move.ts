@@ -1,6 +1,6 @@
 
 import { _decorator, Component, Node, Vec3, KeyCode } from 'cc';
-import { VirtualInput } from '../input/VirtualInput';
+import { VirtualInput } from '../input/VirtualInput.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('move')
