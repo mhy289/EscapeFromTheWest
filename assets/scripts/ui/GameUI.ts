@@ -180,16 +180,14 @@ export class GameUI extends Component {
             this.showVirtualJoystickUI(true);
             this.showKeyboardUI(false);
 
-            // 设置双摇杆回调
-            if (this.dualJoystick && this.playerShooter) {
-                this.dualJoystick.setOnRightMoveCallback((data: any) => {
-                    this.playerShooter.setJoystickAngle(data.angle);
-                });
-            } else if (this.virtualJoystick && this.playerShooter) {
-                // 单摇杆模式兼容
-                this.virtualJoystick.setOnMoveCallback((angle: number, distance: number) => {
-                    this.playerShooter.setJoystickAngle(angle);
-                });
+            // 移除摇杆射击回调 - 移动摇杆不再控制射击方向
+            // 射击方向现在由PlayerAim组件根据右摇杆输入控制
+            if (this.dualJoystick) {
+                // 双摇杆模式：右摇杆通过PlayerAim组件控制射击方向，不需要这里设置回调
+                console.log('双摇杆模式：右摇杆通过PlayerAim组件控制射击方向');
+            } else if (this.virtualJoystick) {
+                // 单摇杆模式：左摇杆只控制移动，不控制射击
+                console.log('单摇杆模式：左摇杆只控制移动');
             }
         } else {
             // 键盘鼠标模式
@@ -297,12 +295,9 @@ export class GameUI extends Component {
     public setPlayerShooter(shooter: PlayerShooter): void {
         this.playerShooter = shooter;
         
-        // 重新初始化摇杆回调
-        if (this.virtualJoystick && shooter) {
-            this.virtualJoystick.setOnMoveCallback((angle: number, distance: number) => {
-                shooter.setJoystickAngle(angle);
-            });
-        }
+        // 移除摇杆回调设置 - 移动摇杆不再控制射击方向
+        // 射击方向现在由PlayerAim组件通过右摇杆控制
+        console.log('GameUI: 玩家射击组件已设置，移动摇杆不再触发射击');
     }
 
     protected onDestroy(): void {
@@ -392,13 +387,14 @@ export class GameUI extends Component {
             this.ammoUpdateInterval = 0;
         }
 
-        // 单摇杆模式下更新射击方向
-        if (this.playerShooter && this.joystick) {
+        // 移除移动摇杆的射击方向更新 - 移动摇杆只控制移动，不控制射击
+        // 射击方向现在由PlayerAim组件根据右摇杆输入控制
+        // 调试：监控移动摇杆输入
+        if (this.playerShooter) {
             const x = VirtualInput.horizontal;
             const y = VirtualInput.vertical;
             if (x !== 0 || y !== 0) {
-                const angle = Math.atan2(y, x);
-                this.playerShooter.setJoystickAngle(angle);
+                // console.log(`移动摇杆输入: (${x.toFixed(2)}, ${y.toFixed(2)}) - 不触发射击`);
             }
         }
     }

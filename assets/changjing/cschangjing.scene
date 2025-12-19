@@ -2455,7 +2455,7 @@
     "reloadButton": null,
     "virtualJoystick": null,
     "useVirtualJoystick": false,
-    "autoAimMode": true,
+    "autoAimMode": false,
     "aimRange": 1000,
     "_id": "a0JyOolnBJIJf2dFQuPyvN"
   },

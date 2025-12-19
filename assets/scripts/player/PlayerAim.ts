@@ -19,6 +19,16 @@ export class PlayerAim extends Component {
      */
     private _aimDirection: Vec3 = new Vec3(1, 0, 0);
 
+    start() {
+        console.log('PlayerAim started - 射击组件引用:', this.shooter ? '已设置' : '未设置');
+        
+        // 如果没有设置shooter，尝试在同节点上查找
+        if (!this.shooter) {
+            this.shooter = this.node.getComponent(PlayerShooter);
+            console.log('PlayerAim: 自动查找射击组件 -', this.shooter ? '找到' : '未找到');
+        }
+    }
+
     update(deltaTime: number) {
         const x = VirtualInput.aimX;
         const y = VirtualInput.aimY;
