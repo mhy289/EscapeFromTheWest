@@ -1,7 +1,6 @@
 import { _decorator, Component, Node, Label, Button, input, Input, Vec3 } from 'cc';
 import { PlayerShooter } from '../player/shot.ts';
 import { UIJoyStick } from './moveUIJoyStick.ts';
-import { VirtualInput } from '../input/VirtualInput.ts';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameUI')

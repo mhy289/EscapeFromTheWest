@@ -65,7 +65,7 @@ export class PlayerShooter extends Component {
     @property({
         tooltip: '操作模式：false=键盘鼠标模式（WASD+鼠标+左键+R键），true=虚拟摇杆模式（双摇杆+按钮）'
     })
-    useVirtualJoystick: boolean = false;
+    useVirtualJoystick: boolean = true;
 
     // 状态变量
     private canFire: boolean = true;
@@ -153,8 +153,58 @@ export class PlayerShooter extends Component {
     }
 
     private setupVirtualJoystickControls(): void {
-        // 虚拟摇杆模式下的触摸控制已移至GameUI.ts中统一管理
-        console.log('🔥 PlayerShooter: 虚拟摇杆控制已移至GameUI.ts管理');
+        console.log('Shot: 设置虚拟摇杆控制');
+        
+        // 查找开火按钮节点
+        const canvas = find('Canvas');
+        if (canvas) {
+            console.log('Canvas下的子节点:');
+            for (let i = 0; i < canvas.children.length; i++) {
+                const child = canvas.children[i];
+                console.log(`  - ${child.name} (active: ${child.active})`);
+            }
+            
+            // 查找shoot节点
+            const shootNode = canvas.getChildByName('shoot');
+            if (shootNode) {
+                console.log('✅ 找到shoot节点:', shootNode.name);
+                
+                // 检查是否有Button组件
+                const button = shootNode.getComponent(Button);
+                if (button) {
+                    console.log('✅ shoot节点有Button组件');
+                    console.log('📝 请在Cocos Creator中配置shoot按钮的Click Events：');
+                    console.log('   - Target: 拖拽Player节点');
+                    console.log('   - Component: 选择PlayerShooter');
+                    console.log('   - Function: 选择onFireButtonClick');
+                } else {
+                    console.warn('⚠️ shoot节点没有Button组件');
+                }
+            } else {
+                console.warn('⚠️ 未找到shoot节点');
+            }
+        } else {
+            console.error('❌ 未找到Canvas节点！');
+        }
+        
+        // 提供键盘备用方案
+        console.log('📱 虚拟摇杆模式控制说明：');
+        console.log('  - 移动：屏幕左侧摇杆');
+        console.log('  - 瞄准：屏幕右侧摇杆');
+        console.log('  - 开火：点击shoot按钮或按空格键');
+        
+        console.log('虚拟摇杆控制设置完成');
+    }
+    
+    // Click Event回调方法 - 由Button组件调用
+    public onFireButtonClick(): void {
+        console.log('🔥 Click Event: 开火按钮被点击');
+        this.fireKeyPressed = true;
+        
+        // 短暂延迟后重置开火状态，模拟按压效果
+        this.scheduleOnce(() => {
+            this.fireKeyPressed = false;
+        }, 0.1);
     }
 
     private onKeyDown(keyCode: number): void {
@@ -164,12 +214,29 @@ export class PlayerShooter extends Component {
             this.reloadKeyPressed = true;
             this.tryReload();
         }
+        
+        // 虚拟摇杆模式下的键盘备用方案
+        if (this.useVirtualJoystick) {
+            // 空格键开火（虚拟摇杆模式的备用方案）
+            if (keyCode === KeyCode.SPACE) {
+                console.log('🔥 Shot: 空格键开火（虚拟摇杆模式）');
+                this.fireKeyPressed = true;
+            }
+        }
     }
 
     private onKeyUp(keyCode: number): void {
         if (keyCode === KeyCode.KEY_R) {
-            console.log('Shot: R键释放');
             this.reloadKeyPressed = false;
+        }
+        
+        // 虚拟摇杆模式下的键盘备用方案
+        if (this.useVirtualJoystick) {
+            // 空格键开火（虚拟摇杆模式的备用方案）
+            if (keyCode === KeyCode.SPACE) {
+                console.log('🔥 Shot: 空格键释放 - 停止开火');
+                this.fireKeyPressed = false;
+            }
         }
     }
 
@@ -276,20 +343,18 @@ export class PlayerShooter extends Component {
         // 计算射击方向
         const direction = this.getFireDirection();
         
-        console.log(`发射子弹: 位置(${this.node.getPosition().x.toFixed(1)}, ${this.node.getPosition().y.toFixed(1)}), 方向(${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
+        console.log(`🔥 发射子弹: 方向(${direction.x.toFixed(2)}, ${direction.y.toFixed(2)})`);
         
         // 设置子弹速度和方向
         const bulletScript = bullet.getComponent(Bullet);
         if (bulletScript) {
             bulletScript.initialize(direction, this.bulletSpeed, this.bulletDamage);
-            console.log('子弹初始化成功');
         } else {
             console.warn('子弹预制体没有Bullet组件，尝试添加...');
             // 尝试动态添加Bullet组件
             const addedScript = bullet.addComponent(Bullet);
             if (addedScript) {
                 addedScript.initialize(direction, this.bulletSpeed, this.bulletDamage);
-                console.log('动态添加Bullet组件并初始化成功');
             } else {
                 console.error('无法添加Bullet组件，销毁子弹');
                 bullet.destroy();
@@ -308,7 +373,7 @@ export class PlayerShooter extends Component {
         // 播放射击音效（如果有的话）
         // AudioManager.instance.playGunshot();
 
-        console.log(`开火！剩余弹药: ${this.currentAmmo}/${this.maxAmmo}`);
+        console.log(`🔥 开火！弹药: ${this.currentAmmo}/${this.maxAmmo}`);
 
         // 射击冷却
         this.scheduleOnce(() => {
@@ -457,11 +522,31 @@ export class PlayerShooter extends Component {
         }
     }
 
+    // 调试方法：输出节点层次结构
+    private logNodeHierarchy(node: Node, depth: number): void {
+        if (depth > 3) return; // 限制递归深度
+        
+        const indent = '  '.repeat(depth);
+        for (let i = 0; i < node.children.length; i++) {
+            const child = node.children[i];
+            console.log(`${indent}- ${child.name} (active: ${child.active})`);
+            
+            // 检查是否是UI按钮相关的
+            const lowerName = child.name.toLowerCase();
+            if (lowerName.includes('fire') || lowerName.includes('button') || 
+                lowerName.includes('reload') || lowerName.includes('shoot')) {
+                console.log(`${indent}  🎯 发现可能的UI按钮节点！`);
+            }
+            
+            this.logNodeHierarchy(child, depth + 1);
+        }
+    }
+
     protected onDestroy(): void {
         // 清理事件监听
         if (this.useVirtualJoystick) {
-            // 虚拟摇杆模式：事件监听器由GameUI.ts管理，这里无需清理
-            console.log('🔥 PlayerShooter.onDestroy - 虚拟摇杆模式，事件由GameUI.ts管理');
+            // 使用Click Event时无需手动清理，由Button组件自动管理
+            console.log('🔥 使用Click Event模式，无需手动清理事件监听器');
         } else {
             // 键盘鼠标模式清理
             if (InputManager.instance) {
