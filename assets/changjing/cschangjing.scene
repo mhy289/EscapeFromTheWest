@@ -191,7 +191,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 360,
+    "_orthoHeight": 360.00000000000006,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -2354,7 +2354,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "26ca4063-eaa5-4c11-9f4e-d8c18a4c4c17@f9941",
+      "__uuid__": "566729ed-97ad-4135-b04b-d9eb8fce355c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
@@ -3495,7 +3495,7 @@
     "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
+    "_actualFontSize": 21.805555555555554,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
